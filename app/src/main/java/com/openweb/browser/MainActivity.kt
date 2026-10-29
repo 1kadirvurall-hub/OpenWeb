@@ -214,11 +214,60 @@ class MainActivity : Activity() {
             showBrowserMenu()
         }, LinearLayout.LayoutParams(0, 52, 1f))
 
-        root.addView(bottom, LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        val tabStrip = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(2, 4, 2, 4)
+            background = rounded(Color.BLACK, 14f)
+        }
+
+        fun refreshTabStrip() {
+            tabStrip.removeAllViews()
+            tabs.forEachIndexed { i, tab ->
+                val item = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.CENTER_VERTICAL
+                    setPadding(10, 6, 6, 6)
+                    background = rounded(
+                        if (i == activeTab) Color.rgb(35, 42, 55) else Color.rgb(15, 15, 15),
+                        12f
+                    )
+                    setOnClickListener { switchTab(i) }
+                }
+                item.addView(TextView(this).apply {
+                    text = tab.title?.takeIf { it.isNotBlank() && it != "about:blank" }
+                        ?.take(12) ?: "Yeni sekme"
+                    textSize = 12f
+                    setTextColor(Color.WHITE)
+                    maxLines = 1
+                    ellipsize = android.text.TextUtils.TruncateAt.END
+                }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+                item.addView(TextView(this).apply {
+                    text = "×"
+                    textSize = 19f
+                    setTextColor(Color.LTGRAY)
+                    setPadding(8, 0, 4, 0)
+                    setOnClickListener { closeTab(i) }
+                })
+                tabStrip.addView(item, LinearLayout.LayoutParams(
+                    150, ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply { rightMargin = 6 })
+            }
+            tabStrip.addView(TextView(this).apply {
+                text = "+"
+                textSize = 25f
+                gravity = Gravity.CENTER
+                setTextColor(accent)
+                setOnClickListener { addTab() }
+            }, LinearLayout.LayoutParams(44, 42))
+        }
+
+        root.addView(tabStrip, root.indexOfChild(bottom), LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, 48
         ))
 
         setContentView(root)
+        refreshTabStrip()
 
         address.setOnEditorActionListener { _, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_GO ||
