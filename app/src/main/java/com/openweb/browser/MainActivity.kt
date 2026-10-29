@@ -39,7 +39,7 @@ class MainActivity : Activity() {
 
         address = EditText(this).apply {
             hint = "Adres veya arama yaz"
-            singleLine = true
+            setSingleLine(true)
             textSize = 15f
             imeOptions = EditorInfo.IME_ACTION_GO
             setPadding(12, 0, 12, 0)
