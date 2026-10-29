@@ -417,29 +417,79 @@ class MainActivity : Activity() {
 
                 var downX = 0f
                 var downY = 0f
-                card.setOnTouchListener { v, event ->
+                var draggingHorizontally = false
+                card.setOnTouchListener { _, event ->
                     when (event.actionMasked) {
                         android.view.MotionEvent.ACTION_DOWN -> {
-                            downX = event.x
-                            downY = event.y
+                            downX = event.rawX
+                            downY = event.rawY
+                            draggingHorizontally = false
+                            card.animate().cancel()
                             true
                         }
-                        android.view.MotionEvent.ACTION_UP -> {
-                            val dx = event.x - downX
-                            val dy = event.y - downY
-                            if ((kotlin.math.abs(dx) > 75 &&
-                                    kotlin.math.abs(dx) > kotlin.math.abs(dy)) ||
-                                (dy < -75 && kotlin.math.abs(dy) > kotlin.math.abs(dx))) {
-                                val current = tabs.indexOf(tab)
-                                if (current >= 0) closeTab(current)
-                                dialog.setTitle("Sekmeler (${tabs.size})")
-                                render()
-                            } else if (kotlin.math.abs(dx) < 15 &&
-                                kotlin.math.abs(dy) < 15) {
-                                val current = tabs.indexOf(tab)
-                                if (current >= 0) {
-                                    dialog.dismiss()
-                                    switchTab(current)
+                        android.view.MotionEvent.ACTION_MOVE -> {
+                            val dx = event.rawX - downX
+                            val dy = event.rawY - downY
+                            if (kotlin.math.abs(dx) > 8 &&
+                                kotlin.math.abs(dx) > kotlin.math.abs(dy)) {
+                                draggingHorizontally = true
+                                card.translationX = dx
+                                card.rotation =
+                                    dx / card.width.coerceAtLeast(1) * 7f
+                                card.alpha = (
+                                    1f - kotlin.math.abs(dx) /
+                                    (card.width.coerceAtLeast(1) * 1.8f)
+                                ).coerceAtLeast(0.35f)
+                            }
+                            true
+                        }
+                        android.view.MotionEvent.ACTION_UP,
+                        android.view.MotionEvent.ACTION_CANCEL -> {
+                            val dx = event.rawX - downX
+                            val dy = event.rawY - downY
+                            val closeBySwipe =
+                                event.actionMasked ==
+                                    android.view.MotionEvent.ACTION_UP &&
+                                draggingHorizontally &&
+                                kotlin.math.abs(dx) > card.width * 0.28f
+                            val closeUpward =
+                                event.actionMasked ==
+                                    android.view.MotionEvent.ACTION_UP &&
+                                dy < -90 &&
+                                kotlin.math.abs(dy) > kotlin.math.abs(dx)
+
+                            if (closeBySwipe || closeUpward) {
+                                val direction = if (dx >= 0) 1f else -1f
+                                card.animate()
+                                    .translationX(direction * card.width)
+                                    .rotation(direction * 10f)
+                                    .alpha(0f)
+                                    .setDuration(160)
+                                    .withEndAction {
+                                        val current = tabs.indexOf(tab)
+                                        if (current >= 0) closeTab(current)
+                                        dialog.setTitle("Sekmeler (${tabs.size})")
+                                        render()
+                                    }
+                                    .start()
+                            } else {
+                                card.animate()
+                                    .translationX(0f)
+                                    .rotation(0f)
+                                    .alpha(1f)
+                                    .setDuration(180)
+                                    .start()
+
+                                if (event.actionMasked ==
+                                        android.view.MotionEvent.ACTION_UP &&
+                                    !draggingHorizontally &&
+                                    kotlin.math.abs(dx) < 15 &&
+                                    kotlin.math.abs(dy) < 15) {
+                                    val current = tabs.indexOf(tab)
+                                    if (current >= 0) {
+                                        dialog.dismiss()
+                                        switchTab(current)
+                                    }
                                 }
                             }
                             true
