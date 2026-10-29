@@ -39,3 +39,4 @@ android {
         }
     }
 }
+\ndependencies {\n    implementation("androidx.credentials:credentials:1.5.0")\n    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")\n    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")\n}
