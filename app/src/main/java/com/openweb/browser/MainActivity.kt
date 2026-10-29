@@ -217,53 +217,21 @@ class MainActivity : Activity() {
         val tabStrip = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(2, 4, 2, 4)
+            setPadding(4, 6, 4, 6)
             background = rounded(Color.BLACK, 14f)
         }
 
-        fun refreshTabStrip() {
-            tabStrip.removeAllViews()
-            tabs.forEachIndexed { i, tab ->
-                val item = LinearLayout(this).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                    gravity = Gravity.CENTER_VERTICAL
-                    setPadding(10, 6, 6, 6)
-                    background = rounded(
-                        if (i == activeTab) Color.rgb(35, 42, 55) else Color.rgb(15, 15, 15),
-                        12f
-                    )
-                    setOnClickListener { switchTab(i) }
-                }
-                item.addView(TextView(this).apply {
-                    text = tab.title?.takeIf { it.isNotBlank() && it != "about:blank" }
-                        ?.take(12) ?: "Yeni sekme"
-                    textSize = 12f
-                    setTextColor(Color.WHITE)
-                    maxLines = 1
-                    ellipsize = android.text.TextUtils.TruncateAt.END
-                }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-                item.addView(TextView(this).apply {
-                    text = "×"
-                    textSize = 19f
-                    setTextColor(Color.LTGRAY)
-                    setPadding(8, 0, 4, 0)
-                    setOnClickListener { closeTab(i) }
-                })
-                tabStrip.addView(item, LinearLayout.LayoutParams(
-                    150, ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply { rightMargin = 6 })
-            }
-            tabStrip.addView(TextView(this).apply {
-                text = "+"
-                textSize = 25f
-                gravity = Gravity.CENTER
-                setTextColor(accent)
-                setOnClickListener { addTab() }
-            }, LinearLayout.LayoutParams(44, 42))
+        val tabScroll = android.widget.HorizontalScrollView(this).apply {
+            isHorizontalScrollBarEnabled = false
+            clipToPadding = false
+            addView(tabStrip, android.widget.HorizontalScrollView.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT
+            ))
         }
 
-        root.addView(tabStrip, LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, 48
+
+        root.addView(tabScroll, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, 58
         ))
         root.removeView(bottom)
         root.addView(bottom, LinearLayout.LayoutParams(
@@ -419,6 +387,58 @@ class MainActivity : Activity() {
         dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)?.setTextColor(accent)
     }
 
+    private fun refreshTabStrip() {
+            tabStrip.removeAllViews()
+            tabs.forEachIndexed { i, tab ->
+                val label = tab.title?.takeIf { it.isNotBlank() && it != "about:blank" }
+                    ?: tab.url?.takeIf { it.isNotBlank() && it != "about:blank" }
+                        ?.substringAfter("://")?.substringBefore("/")?.removePrefix("www.")
+                    ?: "Yeni sekme"
+
+                val item = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.CENTER_VERTICAL
+                    setPadding(12, 8, 8, 8)
+                    background = rounded(
+                        if (i == activeTab) Color.rgb(35, 42, 55) else Color.rgb(18, 18, 18),
+                        12f
+                    )
+                }
+
+                item.addView(TextView(this).apply {
+                    text = label.take(18)
+                    textSize = 13f
+                    setTextColor(Color.WHITE)
+                    maxLines = 1
+                    ellipsize = android.text.TextUtils.TruncateAt.END
+                    setOnClickListener { switchTab(i) }
+                }, LinearLayout.LayoutParams(WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+
+                item.addView(TextView(this).apply {
+                    text = "×"
+                    textSize = 20f
+                    setTextColor(Color.LTGRAY)
+                    setPadding(10, 0, 0, 0)
+                    setOnClickListener { closeTab(i) }
+                })
+
+                item.setOnClickListener { switchTab(i) }
+                tabStrip.addView(item, LinearLayout.LayoutParams(
+                    WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT
+                ).apply { rightMargin = 6 })
+            }
+
+            tabStrip.addView(TextView(this).apply {
+                text = "+"
+                textSize = 25f
+                gravity = Gravity.CENTER
+                setTextColor(accent)
+                setPadding(12, 0, 12, 0)
+                setOnClickListener { addTab() }
+            }, LinearLayout.LayoutParams(WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        }
+
+
     private fun addTab() {
         val tab = WebView(this).apply {
             setBackgroundColor(bg)
@@ -441,6 +461,7 @@ class MainActivity : Activity() {
         tabs.add(tab)
         web = tab
         activeTab = tabs.lastIndex
+        refreshTabStrip()
         loadHome()
         Toast.makeText(this, "Yeni sekme açıldı", Toast.LENGTH_SHORT).show()
     }
@@ -473,6 +494,7 @@ class MainActivity : Activity() {
         android.webkit.CookieManager.getInstance().setAcceptCookie(false)
         web = tab
         activeTab = tabs.lastIndex
+        refreshTabStrip()
         loadHome()
         Toast.makeText(this, "Gizli sekme açıldı", Toast.LENGTH_SHORT).show()
     }
@@ -484,6 +506,7 @@ class MainActivity : Activity() {
         (web.parent as? ViewGroup)?.removeView(web)
         web = tabs[index]
         activeTab = index
+        refreshTabStrip()
         val privateMode = privateTabs.contains(web)
         val rootView = root
         rootView.setBackgroundColor(if (privateMode) privateBg else bg)
@@ -507,6 +530,7 @@ class MainActivity : Activity() {
         (closing.parent as? ViewGroup)?.removeView(closing)
         closing.destroy()
         activeTab = (index - 1).coerceAtLeast(0)
+        refreshTabStrip()
         switchTab(activeTab)
     }
 
