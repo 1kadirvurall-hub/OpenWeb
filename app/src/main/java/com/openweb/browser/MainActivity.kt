@@ -27,8 +27,8 @@ class MainActivity : Activity() {
     private lateinit var address: EditText
     private lateinit var progress: ProgressBar
 
-    private val bg = Color.rgb(8, 13, 24)
-    private val panel = Color.rgb(17, 29, 48)
+    private val bg = Color.BLACK
+    private val panel = Color.BLACK
     private val accent = Color.rgb(190, 210, 245)
     private val muted = Color.rgb(145, 164, 192)
 
@@ -263,7 +263,7 @@ class MainActivity : Activity() {
         }
 
         val dialog = android.app.AlertDialog.Builder(
-            this, android.R.style.Theme_Material_NoActionBar
+            this, android.R.style.Theme_Material_Dialog_Alert
         ).setTitle("Sekmeler (${tabs.size})")
             .setView(content)
             .setNegativeButton("Kapat", null)
@@ -320,7 +320,7 @@ class MainActivity : Activity() {
         }
         content.addView(add)
         dialog.show()
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.black)
         dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)?.apply {
             setTextColor(accent)
         }
