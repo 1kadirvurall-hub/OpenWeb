@@ -151,7 +151,7 @@ class MainActivity : Activity() {
             }
         }
 
-        web.setDownloadListener { url, userAgent, contentDisposition, mimeType ->
+        web.setDownloadListener { url, userAgent, contentDisposition, mimeType, _ ->
             try {
                 val fileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
                 val request = DownloadManager.Request(Uri.parse(url)).apply {
