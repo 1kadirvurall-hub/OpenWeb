@@ -33,6 +33,8 @@ class MainActivity : Activity() {
     private val privateBg = Color.rgb(8, 13, 24)
     private val accent = Color.rgb(190, 210, 245)
     private val muted = Color.rgb(145, 164, 192)
+    private val prefs by lazy { getSharedPreferences("openweb_settings", MODE_PRIVATE) }
+    private var addressBarAtBottom = false
 
     private fun rounded(color: Int, radius: Float = 24f): GradientDrawable {
         return GradientDrawable().apply {
@@ -47,6 +49,7 @@ class MainActivity : Activity() {
         window.navigationBarColor = bg
         window.decorView.systemUiVisibility = 0
 
+        addressBarAtBottom = prefs.getBoolean("address_bottom", false)
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(14, 8, 14, 4)
@@ -115,7 +118,7 @@ class MainActivity : Activity() {
         addressBar.addView(makeIconButton("➜", "Git") {
             loadAddress()
         })
-        root.addView(addressBar)
+        if (!addressBarAtBottom) root.addView(addressBar)
 
         progress = ProgressBar(
             this, null, android.R.attr.progressBarStyleHorizontal
@@ -510,7 +513,8 @@ class MainActivity : Activity() {
             "Gizli sekme",
             "Uzantılar",
             "Sayfayı yenile",
-            "İndirilenler"
+            "İndirilenler",
+            "Arama çubuğu: " + if (addressBarAtBottom) "Üste al" else "Alta al"
         )
         val dialog = android.app.AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
             .setTitle("OpenWeb")
@@ -521,6 +525,11 @@ class MainActivity : Activity() {
                     2 -> Toast.makeText(this, "Uzantı desteğini sonraki adımda ele alacağız.", Toast.LENGTH_SHORT).show()
                     3 -> web.reload()
                     4 -> startActivity(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS))
+                    5 -> {
+                        addressBarAtBottom = !addressBarAtBottom
+                        prefs.edit().putBoolean("address_bottom", addressBarAtBottom).apply()
+                        recreate()
+                    }
                 }
             }
             .create()
