@@ -97,7 +97,7 @@ class MainActivity : Activity() {
             setHintTextColor(muted)
             setTextColor(Color.rgb(240, 245, 255))
             textSize = 15f
-            singleLine = true
+            setSingleLine(true)
             imeOptions = EditorInfo.IME_ACTION_GO
             inputType = android.text.InputType.TYPE_CLASS_TEXT or
                 android.text.InputType.TYPE_TEXT_VARIATION_URI
@@ -141,8 +141,8 @@ class MainActivity : Activity() {
             }
             webChromeClient = object : WebChromeClient() {
                 override fun onProgressChanged(view: WebView, newProgress: Int) {
-                    progress.progress = newProgress
-                    progress.visibility =
+                    this@MainActivity.progress.progress = newProgress
+                    this@MainActivity.progress.visibility =
                         if (newProgress < 100) View.VISIBLE else View.GONE
                 }
             }
