@@ -261,8 +261,8 @@ class MainActivity : Activity() {
         }.toMutableList()
         labels.add("＋ Yeni sekme")
         labels.add("× Geçerli sekmeyi kapat")
-        android.app.AlertDialog.Builder(this)
-            .setTitle("Sekmeler (${tabs.size})")
+        android.app.AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            .setTitle("Sekmeler (${tabs.size})
             .setItems(labels.toTypedArray()) { _, which ->
                 when {
                     which < tabs.size -> switchTab(which)
@@ -417,7 +417,7 @@ class MainActivity : Activity() {
             "Sayfayı yenile",
             "İndirilenler"
         )
-        android.app.AlertDialog.Builder(this)
+        android.app.AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
             .setTitle("OpenWeb")
             .setItems(options) { _, which ->
                 when (which) {
