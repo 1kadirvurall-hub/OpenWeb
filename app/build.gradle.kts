@@ -20,7 +20,22 @@ android {
         applicationId = "com.openweb.browser"
         minSdk = 23
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
+    }
+
+    signingConfigs {
+        create("stable") {
+            storeFile = file(System.getenv("KS_PATH"))
+            storePassword = System.getenv("KS_PASS")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASS")
+        }
+    }
+
+    buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("stable")
+        }
     }
 }
