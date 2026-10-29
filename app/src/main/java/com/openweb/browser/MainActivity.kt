@@ -11,10 +11,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.content.Intent
+import android.app.DownloadManager
+import android.os.Environment
 import android.net.Uri
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.webkit.WebChromeClient
+import android.webkit.URLUtil
 import android.widget.*
 
 class MainActivity : Activity() {
@@ -145,6 +148,29 @@ class MainActivity : Activity() {
                     this@MainActivity.progress.visibility =
                         if (newProgress < 100) View.VISIBLE else View.GONE
                 }
+            }
+        }
+
+        web.setDownloadListener { url, userAgent, contentDisposition, mimeType ->
+            try {
+                val fileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
+                val request = DownloadManager.Request(Uri.parse(url)).apply {
+                    setTitle(fileName)
+                    setDescription("OpenWeb üzerinden indiriliyor")
+                    setMimeType(mimeType)
+                    addRequestHeader("User-Agent", userAgent)
+                    setNotificationVisibility(
+                        DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
+                    )
+                    setDestinationInExternalPublicDir(
+                        Environment.DIRECTORY_DOWNLOADS, fileName
+                    )
+                }
+                val manager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+                manager.enqueue(request)
+                Toast.makeText(this, "İndirme başladı: $fileName", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this, "İndirme başlatılamadı: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
 
@@ -315,7 +341,8 @@ class MainActivity : Activity() {
             "Yeni sekme",
             "Gizli sekme",
             "Uzantılar",
-            "Sayfayı yenile"
+            "Sayfayı yenile",
+            "İndirilenler"
         )
         android.app.AlertDialog.Builder(this)
             .setTitle("OpenWeb")
@@ -325,6 +352,7 @@ class MainActivity : Activity() {
                     1 -> Toast.makeText(this, "Gizli gezinme özelliğini sonraki adımda ekleyeceğiz.", Toast.LENGTH_SHORT).show()
                     2 -> Toast.makeText(this, "Uzantı desteğini sonraki adımda ele alacağız.", Toast.LENGTH_SHORT).show()
                     3 -> web.reload()
+                    4 -> startActivity(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS))
                 }
             }
             .show()
