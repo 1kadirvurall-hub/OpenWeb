@@ -293,28 +293,43 @@ class MainActivity : Activity() {
     private fun makeTabCountButton(top: Boolean): TextView {
         val count = tabs.count { it !in privateTabs }
         return TextView(this).apply {
-            text = "▣\\n$count"
-            textSize = if (top) 19f else 22f
+            text = "▢ $count"
+            textSize = if (top) 22f else 26f
             gravity = Gravity.CENTER
-            minWidth = if (top) 52 else 62
-            minHeight = if (top) 52 else 58
-            setPadding(4, 2, 4, 2)
-            background = rounded(Color.rgb(35, 42, 55), 10f)
             setTextColor(accent)
-            contentDescription = "Normal sekmeler: $count"
+            minWidth = if (top) 52 else 62
+            minHeight = if (top) 52 else 62
+            setPadding(0, 0, 0, 0)
+            background = rounded(Color.rgb(35, 42, 55), 12f)
+            contentDescription = "Sekmeler: $count"
             setOnClickListener { showTabsMenu() }
             if (top) topTabCountButton = this else bottomTabCountButton = this
+            setCompoundDrawablePadding(0)
+            post {
+                val badge = TextView(this@MainActivity).apply {
+                    text = count.toString()
+                    textSize = 12f
+                    gravity = Gravity.CENTER
+                    setTextColor(Color.WHITE)
+                    background = rounded(accent, 20f)
+                    elevation = 5f
+                }
+                val parent = parent as? ViewGroup
+                if (parent != null && tag != "badge-added") {
+                    tag = "badge-added"
+                }
+            }
         }
     }
 
     private fun updateTabCounts() {
         val count = tabs.count { it !in privateTabs }
         topTabCountButton?.apply {
-            text = "▣\\n$count"
+            text = "▢ $count"
             contentDescription = "Normal sekmeler: $count"
         }
         bottomTabCountButton?.apply {
-            text = "▣\\n$count"
+            text = "▢ $count"
             contentDescription = "Normal sekmeler: $count"
         }
     }
