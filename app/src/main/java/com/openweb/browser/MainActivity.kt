@@ -262,7 +262,7 @@ class MainActivity : Activity() {
         labels.add("＋ Yeni sekme")
         labels.add("× Geçerli sekmeyi kapat")
         android.app.AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-            .setTitle("Sekmeler (${tabs.size})
+            .setTitle("Sekmeler (${tabs.size})")
             .setItems(labels.toTypedArray()) { _, which ->
                 when {
                     which < tabs.size -> switchTab(which)
