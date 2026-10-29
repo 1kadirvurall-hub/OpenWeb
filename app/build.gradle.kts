@@ -24,19 +24,9 @@ android {
         versionName = "1.3"
     }
 
-    signingConfigs {
-        create("stable") {
-            storeFile = file(System.getenv("KS_PATH"))
-            storePassword = System.getenv("KS_PASS")
-            keyAlias = System.getenv("KEY_ALIAS")
-            keyPassword = System.getenv("KEY_PASS")
-        }
-    }
-
     buildTypes {
         getByName("debug") {
-            signingConfig = signingConfigs.getByName("stable")
-        }
+          }
     }
 }
 

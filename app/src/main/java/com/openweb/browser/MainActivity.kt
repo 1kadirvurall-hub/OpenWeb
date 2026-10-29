@@ -205,18 +205,21 @@ class MainActivity : Activity() {
             return TextView(this).apply {
                 text = symbol
                 contentDescription = description
-                textSize = 31f
+                textSize = if (symbol == "⋮" || symbol == "▢") 36f else 34f
                 includeFontPadding = false
                 gravity = Gravity.CENTER
-                setTextColor(Color.rgb(35, 86, 155))
+                setTextColor(Color.rgb(55, 120, 210))
                 background = rounded(Color.TRANSPARENT, 18f)
+                setPadding(0, 0, 0, 0)
+                minWidth = 60
+                minHeight = 64
                 setOnClickListener { action() }
             }
         }
 
         bottom.addView(chromeButton("⌂", "Ana sayfa") {
             loadHome()
-        }, LinearLayout.LayoutParams(50, 60))
+        }, LinearLayout.LayoutParams(60, 64))
 
         val urlCapsule = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -239,22 +242,22 @@ class MainActivity : Activity() {
         }
 
         urlCapsule.addView(address, LinearLayout.LayoutParams(0, 44, 1f))
-        bottom.addView(urlCapsule, LinearLayout.LayoutParams(0, 54, 1f).apply {
+        bottom.addView(urlCapsule, LinearLayout.LayoutParams(0, 50, 1f).apply {
             leftMargin = 3
             rightMargin = 3
         })
 
         bottom.addView(chromeButton("+", "Yeni sekme") {
             addTab()
-        }, LinearLayout.LayoutParams(50, 60))
+        }, LinearLayout.LayoutParams(60, 64))
 
         bottom.addView(chromeButton("▢", "Açık sekmeler") {
             showTabsMenu()
-        }, LinearLayout.LayoutParams(50, 60))
+        }, LinearLayout.LayoutParams(60, 64))
 
         bottom.addView(chromeButton("⋮", "Menü") {
             showBrowserMenu()
-        }, LinearLayout.LayoutParams(50, 60))
+        }, LinearLayout.LayoutParams(60, 64))
 
         tabStrip = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
