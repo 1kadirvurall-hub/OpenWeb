@@ -219,7 +219,7 @@ class MainActivity : Activity() {
         tabStrip = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(4, 6, 4, 6)
+            setPadding(8, 8, 8, 8)
             background = rounded(Color.BLACK, 14f)
         }
 
@@ -233,7 +233,7 @@ class MainActivity : Activity() {
 
 
         root.addView(tabScroll, LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, 64
+            ViewGroup.LayoutParams.MATCH_PARENT, 76
         ))
         root.removeView(bottom)
         root.addView(bottom, LinearLayout.LayoutParams(
@@ -400,44 +400,51 @@ class MainActivity : Activity() {
                 val item = LinearLayout(this).apply {
                     orientation = LinearLayout.HORIZONTAL
                     gravity = Gravity.CENTER_VERTICAL
-                    setPadding(14, 10, 10, 10)
+                    setPadding(12, 4, 4, 4)
+                    minimumWidth = 156
                     background = rounded(
-                        if (i == activeTab) Color.rgb(35, 42, 55) else Color.rgb(18, 18, 18),
-                        12f
+                        if (i == activeTab) Color.rgb(35, 42, 55) else Color.rgb(24, 24, 24),
+                        14f
                     )
                 }
 
                 item.addView(TextView(this).apply {
                     text = label.take(18)
-                    textSize = 14f
+                    textSize = 15f
+                    typeface = Typeface.DEFAULT_BOLD
                     setTextColor(Color.WHITE)
+                    gravity = Gravity.CENTER_VERTICAL
                     maxLines = 1
                     ellipsize = android.text.TextUtils.TruncateAt.END
                     setOnClickListener { switchTab(i) }
-                }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+                }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
 
                 item.addView(TextView(this).apply {
                     text = "×"
-                    textSize = 22f
-                    setTextColor(Color.LTGRAY)
-                    setPadding(12, 0, 0, 0)
+                    textSize = 26f
+                    gravity = Gravity.CENTER
+                    setTextColor(Color.WHITE)
+                    background = rounded(Color.rgb(55, 55, 55), 10f)
                     setOnClickListener { closeTab(i) }
+                }, LinearLayout.LayoutParams(40, 44).apply {
+                    leftMargin = 8
                 })
 
                 item.setOnClickListener { switchTab(i) }
                 tabStrip.addView(item, LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT
-                ).apply { rightMargin = 6 })
+                    ViewGroup.LayoutParams.WRAP_CONTENT, 56
+                ).apply { rightMargin = 8 })
             }
 
             tabStrip.addView(TextView(this).apply {
                 text = "+"
-                textSize = 28f
+                textSize = 32f
+                typeface = Typeface.DEFAULT_BOLD
                 gravity = Gravity.CENTER
                 setTextColor(accent)
-                setPadding(16, 0, 16, 0)
+                background = rounded(Color.rgb(35, 42, 55), 14f)
                 setOnClickListener { addTab() }
-            }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT))
+            }, LinearLayout.LayoutParams(56, 56).apply { leftMargin = 2 })
         }
 
 
