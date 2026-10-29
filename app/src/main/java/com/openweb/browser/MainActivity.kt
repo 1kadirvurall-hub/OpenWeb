@@ -285,124 +285,149 @@ class MainActivity : Activity() {
 
 
     private fun showTabsMenu() {
-        val content = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(12, 8, 12, 8)
-            setBackgroundColor(Color.BLACK)
-        }
+        val dialog = android.app.AlertDialog.Builder(
+            this, android.R.style.Theme_Material_Dialog_Alert
+        ).setTitle("Sekmeler (${tabs.size})")
+            .setNegativeButton("Kapat", null)
+            .create()
 
         val scroll = ScrollView(this).apply {
             isFillViewport = true
             isVerticalScrollBarEnabled = false
-            addView(content)
+            setBackgroundColor(Color.BLACK)
         }
 
-        val dialog = android.app.AlertDialog.Builder(
-            this, android.R.style.Theme_Material_Dialog_Alert
-        ).setTitle("Sekmeler (${tabs.size})")
-            .setView(scroll)
-            .setNegativeButton("Kapat", null)
-            .create()
+        val grid = android.widget.GridLayout(this).apply {
+            columnCount = 2
+            setPadding(8, 8, 8, 12)
+            setBackgroundColor(Color.BLACK)
+        }
+        scroll.addView(grid)
 
-        fun renderCards() {
-            content.removeAllViews()
+        fun render() {
+            grid.removeAllViews()
+
+            val cardWidth = ((resources.displayMetrics.widthPixels * 0.94f - 48f) / 2f).toInt()
+            val cardHeight = (cardWidth * 1.05f).toInt()
+
+            fun addTile(view: View) {
+                val lp = android.widget.GridLayout.LayoutParams().apply {
+                    width = 0
+                    height = cardHeight
+                    columnSpec = android.widget.GridLayout.spec(
+                        android.widget.GridLayout.UNDEFINED, 1f
+                    )
+                    setMargins(5, 5, 5, 5)
+                }
+                grid.addView(view, lp)
+            }
 
             tabs.toList().forEach { tab ->
-                val i = tabs.indexOf(tab)
-                if (i < 0) return@forEach
+                val index = tabs.indexOf(tab)
+                if (index < 0) return@forEach
 
-                val card = LinearLayout(this).apply {
-                    orientation = LinearLayout.VERTICAL
-                    setPadding(16, 12, 12, 14)
+                val card = FrameLayout(this).apply {
                     background = rounded(
-                        if (i == activeTab) Color.rgb(35, 45, 62)
-                        else Color.rgb(19, 22, 28),
-                        20f
+                        if (tab === web) Color.rgb(43, 55, 75)
+                        else Color.rgb(24, 27, 33),
+                        18f
                     )
+                    clipToOutline = true
                 }
 
-                val top = LinearLayout(this).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                    gravity = Gravity.CENTER_VERTICAL
+                val body = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    setPadding(5, 5, 5, 8)
                 }
 
-                top.addView(TextView(this).apply {
-                    text = if (i == activeTab) "● Açık sekme" else "○ Sekme ${i + 1}"
-                    textSize = 14f
-                    typeface = Typeface.DEFAULT_BOLD
-                    setTextColor(if (i == activeTab) accent else Color.LTGRAY)
-                }, LinearLayout.LayoutParams(0, 48, 1f))
+                val preview = ImageView(this).apply {
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    setBackgroundColor(Color.rgb(15, 18, 23))
+                    contentDescription = "Sayfa ön izlemesi"
+                }
 
-                top.addView(TextView(this).apply {
-                    text = "×"
-                    textSize = 30f
-                    gravity = Gravity.CENTER
-                    setTextColor(Color.rgb(255, 115, 115))
-                    background = rounded(Color.rgb(55, 35, 40), 16f)
-                    contentDescription = "Sekmeyi kapat"
-                    setOnClickListener {
-                        closeTab(i)
-                        dialog.setTitle("Sekmeler (${tabs.size})")
-                        renderCards()
+                try {
+                    if (tab.width > 0 && tab.height > 0) {
+                        val bmp = android.graphics.Bitmap.createBitmap(
+                            tab.width, tab.height,
+                            android.graphics.Bitmap.Config.ARGB_8888
+                        )
+                        tab.draw(android.graphics.Canvas(bmp))
+                        preview.setImageBitmap(
+                            android.graphics.Bitmap.createScaledBitmap(
+                                bmp, cardWidth - 10,
+                                (cardHeight * 0.70f).toInt(),
+                                true
+                            )
+                        )
                     }
-                }, LinearLayout.LayoutParams(52, 52))
+                } catch (_: Exception) {
+                    // Ön izleme alınamazsa kart boş bir ön izleme alanı gösterir.
+                }
 
-                card.addView(top)
+                body.addView(preview, LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f
+                ))
 
-                card.addView(TextView(this).apply {
+                body.addView(TextView(this).apply {
                     text = tab.title?.takeIf {
                         it.isNotBlank() && it != "about:blank"
-                    } ?: "Yeni sekme"
-                    textSize = 18f
+                    } ?: tab.url?.takeIf {
+                        it.isNotBlank() && it != "about:blank"
+                    }?.substringAfter("://")?.substringBefore("/") ?: "Yeni sekme"
+                    textSize = 14f
                     typeface = Typeface.DEFAULT_BOLD
                     setTextColor(Color.WHITE)
                     maxLines = 2
                     ellipsize = android.text.TextUtils.TruncateAt.END
-                    setPadding(2, 8, 2, 6)
-                })
+                    setPadding(5, 8, 5, 2)
+                }, LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, 48
+                ))
 
-                card.addView(TextView(this).apply {
-                    text = tab.url?.takeIf {
-                        it.isNotBlank() && it != "about:blank"
-                    }?.removePrefix("https://")?.removePrefix("http://")
-                        ?: "Yeni sekme"
-                    textSize = 13f
-                    setTextColor(muted)
-                    maxLines = 2
-                    ellipsize = android.text.TextUtils.TruncateAt.END
-                    setPadding(2, 0, 2, 4)
+                card.addView(body, FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                ))
+
+                val close = TextView(this).apply {
+                    text = "×"
+                    textSize = 27f
+                    gravity = Gravity.CENTER
+                    setTextColor(Color.WHITE)
+                    background = rounded(Color.rgb(35, 35, 40), 30f)
+                    elevation = 8f
+                    contentDescription = "Sekmeyi kapat"
+                    setOnClickListener {
+                        val current = tabs.indexOf(tab)
+                        if (current >= 0) closeTab(current)
+                        dialog.setTitle("Sekmeler (${tabs.size})")
+                        render()
+                    }
+                }
+                card.addView(close, FrameLayout.LayoutParams(46, 46, Gravity.TOP or Gravity.END).apply {
+                    setMargins(0, 4, 4, 0)
                 })
 
                 var downX = 0f
                 var downY = 0f
-                var moved = false
-
-                card.setOnTouchListener { _, event ->
+                card.setOnTouchListener { v, event ->
                     when (event.actionMasked) {
                         android.view.MotionEvent.ACTION_DOWN -> {
                             downX = event.x
                             downY = event.y
-                            moved = false
-                            true
-                        }
-                        android.view.MotionEvent.ACTION_MOVE -> {
-                            if (downY - event.y > 35 ||
-                                kotlin.math.abs(event.x - downX) > 35) {
-                                moved = true
-                            }
                             true
                         }
                         android.view.MotionEvent.ACTION_UP -> {
                             val dx = event.x - downX
                             val dy = event.y - downY
-                            if (dy < -90 && kotlin.math.abs(dy) > kotlin.math.abs(dx)) {
+                            if (dy < -65 && kotlin.math.abs(dy) > kotlin.math.abs(dx)) {
                                 val current = tabs.indexOf(tab)
-                                if (current >= 0) {
-                                    closeTab(current)
-                                    dialog.setTitle("Sekmeler (${tabs.size})")
-                                    renderCards()
-                                }
-                            } else if (!moved) {
+                                if (current >= 0) closeTab(current)
+                                dialog.setTitle("Sekmeler (${tabs.size})")
+                                render()
+                            } else if (kotlin.math.abs(dx) < 15 &&
+                                kotlin.math.abs(dy) < 15) {
                                 val current = tabs.indexOf(tab)
                                 if (current >= 0) {
                                     dialog.dismiss()
@@ -411,44 +436,51 @@ class MainActivity : Activity() {
                             }
                             true
                         }
-                        android.view.MotionEvent.ACTION_CANCEL -> true
                         else -> true
                     }
                 }
 
-                content.addView(card, LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, 164
-                ).apply {
-                    bottomMargin = 12
-                })
+                addTile(card)
             }
 
-            content.addView(TextView(this).apply {
-                text = "＋   Yeni sekme aç"
-                textSize = 17f
+            val add = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
                 gravity = Gravity.CENTER
-                typeface = Typeface.DEFAULT_BOLD
-                setTextColor(accent)
-                background = rounded(Color.rgb(28, 35, 48), 18f)
-                setPadding(12, 18, 12, 18)
+                setPadding(8, 8, 8, 8)
+                background = rounded(Color.rgb(24, 30, 40), 18f)
                 setOnClickListener {
                     dialog.dismiss()
                     addTab()
                 }
-            }, LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, 64
-            ))
+                addView(TextView(this@MainActivity).apply {
+                    text = "+"
+                    textSize = 48f
+                    gravity = Gravity.CENTER
+                    setTextColor(accent)
+                }, LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f
+                ))
+                addView(TextView(this@MainActivity).apply {
+                    text = "Yeni sekme"
+                    textSize = 14f
+                    gravity = Gravity.CENTER
+                    setTextColor(Color.WHITE)
+                }, LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, 48
+                ))
+            }
+            addTile(add)
         }
 
-        renderCards()
+        dialog.setView(scroll)
+        render()
         dialog.show()
         dialog.window?.setBackgroundDrawableResource(android.R.color.black)
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.94).toInt(),
-            (resources.displayMetrics.heightPixels * 0.82).toInt()
+            (resources.displayMetrics.widthPixels * 0.96f).toInt(),
+            (resources.displayMetrics.heightPixels * 0.84f).toInt()
         )
-        dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
-            ?.setTextColor(accent)
+        dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)?.setTextColor(accent)
     }
 
     private fun refreshTabStrip() {
