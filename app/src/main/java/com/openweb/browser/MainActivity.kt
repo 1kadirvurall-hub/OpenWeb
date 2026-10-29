@@ -95,6 +95,12 @@ class MainActivity : Activity() {
         })
         header.addView(titleBox, LinearLayout.LayoutParams(0, -2, 1f))
 
+        header.addView(makeIconButton("▢", "Sekmeler") {
+            showTabsMenu()
+        })
+        header.addView(makeIconButton("⋮", "Menü") {
+            showBrowserMenu()
+        })
         root.addView(header)
 
         val addressBar = LinearLayout(this).apply {
@@ -120,6 +126,7 @@ class MainActivity : Activity() {
         addressBar.addView(makeIconButton("➜", "Git") {
             loadAddress()
         })
+        if (!addressBarAtBottom) root.addView(addressBar)
 
         progress = ProgressBar(
             this, null, android.R.attr.progressBarStyleHorizontal
@@ -186,78 +193,59 @@ class MainActivity : Activity() {
         root.addView(web, LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f
         ))
-
-        // Chrome tarzı alt çubuk: AMOLED siyah arka plan.
-        addressBar.removeView(address)
+        if (addressBarAtBottom) root.addView(addressBar)
 
         val bottom = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setBackgroundColor(Color.BLACK)
-            setPadding(0, 3, 0, 3)
+            gravity = Gravity.CENTER
+            background = rounded(Color.rgb(8, 21, 43), 22f)
+            setPadding(4, 3, 4, 3)
             clipToPadding = false
         }
 
-        fun chromeButton(symbol: String, description: String,
-                         action: () -> Unit): TextView {
-            return TextView(this).apply {
-                text = symbol
-                contentDescription = description
-                textSize = 25f
-                includeFontPadding = false
-                gravity = Gravity.CENTER
-                setTextColor(Color.rgb(35, 86, 155))
-                background = rounded(Color.TRANSPARENT, 18f)
-                setOnClickListener { action() }
-            }
-        }
+        bottom.addView(makeNavButton("‹", "Geri") {
+            if (web.canGoBack()) web.goBack()
+        }, LinearLayout.LayoutParams(0, 56, 1f))
 
-        bottom.addView(chromeButton("⌂", "Ana sayfa") {
+        bottom.addView(makeNavButton("›", "İleri") {
+            if (web.canGoForward()) web.goForward()
+        }, LinearLayout.LayoutParams(0, 56, 1f))
+
+        bottom.addView(makeNavButton("⌂", "Ana sayfa") {
             loadHome()
-        }, LinearLayout.LayoutParams(42, 52))
+        }, LinearLayout.LayoutParams(0, 56, 1f))
 
-        val urlCapsule = LinearLayout(this).apply {
+        bottom.addView(makeNavButton("▢", "Sekmeler") {
+            showTabsMenu()
+        }, LinearLayout.LayoutParams(0, 56, 1f))
+
+        bottom.addView(makeNavButton("⋮", "Menü") {
+            showBrowserMenu()
+        }, LinearLayout.LayoutParams(0, 56, 1f))
+
+        tabStrip = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            background = GradientDrawable().apply {
-                setColor(Color.BLACK)
-                cornerRadius = 18f
-                setStroke(1, Color.rgb(28, 28, 28))
-            }
-            setPadding(9, 0, 7, 0)
+            setPadding(8, 8, 8, 8)
+            background = rounded(Color.BLACK, 14f)
         }
 
-        address.apply {
-            textSize = 12f
-            setSingleLine(true)
-            maxLines = 1
-            ellipsize = android.text.TextUtils.TruncateAt.START
-            setPadding(2, 0, 2, 0)
+        val tabScroll = android.widget.HorizontalScrollView(this).apply {
+            isHorizontalScrollBarEnabled = false
+            clipToPadding = false
+            addView(tabStrip, ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT
+            ))
         }
 
-        urlCapsule.addView(address, LinearLayout.LayoutParams(0, 44, 1f))
-        bottom.addView(urlCapsule, LinearLayout.LayoutParams(0, 48, 1f).apply {
-            leftMargin = 3
-            rightMargin = 3
-        })
 
-        bottom.addView(chromeButton("+", "Yeni sekme") {
-            addTab()
-        }, LinearLayout.LayoutParams(42, 52))
-
-        bottom.addView(chromeButton("▢", "Açık sekmeler") {
-            showTabsMenu()
-        }, LinearLayout.LayoutParams(42, 52))
-
-        bottom.addView(chromeButton("⋮", "Menü") {
-            showBrowserMenu()
-        }, LinearLayout.LayoutParams(42, 52))
-
+        root.addView(tabScroll, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, 96
+        ))
+        root.removeView(bottom)
         root.addView(bottom, LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, 60
-        ).apply {
-            topMargin = 2
-        })
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        ))
 
         setContentView(root)
         refreshTabStrip()
@@ -1027,7 +1015,8 @@ class MainActivity : Activity() {
             "Gizli sekme",
             "Uzantılar",
             "Sayfayı yenile",
-            "İndirilenler"
+            "İndirilenler",
+            "Arama çubuğu: " + if (addressBarAtBottom) "Üste al" else "Alta al"
         )
         val dialog = android.app.AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
             .setTitle("OpenWeb")
@@ -1038,6 +1027,11 @@ class MainActivity : Activity() {
                     2 -> Toast.makeText(this, "Uzantı desteğini sonraki adımda ele alacağız.", Toast.LENGTH_SHORT).show()
                     3 -> web.reload()
                     4 -> startActivity(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS))
+                    5 -> {
+                        addressBarAtBottom = !addressBarAtBottom
+                        prefs.edit().putBoolean("address_bottom", addressBarAtBottom).apply()
+                        recreate()
+                    }
                 }
             }
             .create()
