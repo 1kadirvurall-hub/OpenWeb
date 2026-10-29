@@ -60,7 +60,7 @@ class MainActivity : Activity() {
         addressBarAtBottom = prefs.getBoolean("address_bottom", false)
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(14, 8, 14, 16)
+            setPadding(14, 8, 14, 64)
             setBackgroundColor(bg)
         }
 
@@ -72,7 +72,7 @@ class MainActivity : Activity() {
 
         val logo = TextView(this).apply {
             text = "◉"
-            textSize = 30f
+            textSize = 36f
             setTextColor(accent)
             gravity = Gravity.CENTER
         }
