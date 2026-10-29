@@ -205,7 +205,7 @@ class MainActivity : Activity() {
             return TextView(this).apply {
                 text = symbol
                 contentDescription = description
-                textSize = 25f
+                textSize = 31f
                 includeFontPadding = false
                 gravity = Gravity.CENTER
                 setTextColor(Color.rgb(35, 86, 155))
@@ -216,7 +216,7 @@ class MainActivity : Activity() {
 
         bottom.addView(chromeButton("⌂", "Ana sayfa") {
             loadHome()
-        }, LinearLayout.LayoutParams(42, 54))
+        }, LinearLayout.LayoutParams(50, 60))
 
         val urlCapsule = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -231,30 +231,30 @@ class MainActivity : Activity() {
 
         address.apply {
             hint = "Ara veya adres yaz…"
-            textSize = 12f
+            textSize = 15f
             setSingleLine(true)
             maxLines = 1
-            ellipsize = android.text.TextUtils.TruncateAt.START
+            ellipsize = android.text.TextUtils.TruncateAt.END
             setPadding(2, 0, 2, 0)
         }
 
         urlCapsule.addView(address, LinearLayout.LayoutParams(0, 44, 1f))
-        bottom.addView(urlCapsule, LinearLayout.LayoutParams(0, 48, 1f).apply {
+        bottom.addView(urlCapsule, LinearLayout.LayoutParams(0, 54, 1f).apply {
             leftMargin = 3
             rightMargin = 3
         })
 
         bottom.addView(chromeButton("+", "Yeni sekme") {
             addTab()
-        }, LinearLayout.LayoutParams(42, 54))
+        }, LinearLayout.LayoutParams(50, 60))
 
         bottom.addView(chromeButton("▢", "Açık sekmeler") {
             showTabsMenu()
-        }, LinearLayout.LayoutParams(42, 54))
+        }, LinearLayout.LayoutParams(50, 60))
 
         bottom.addView(chromeButton("⋮", "Menü") {
             showBrowserMenu()
-        }, LinearLayout.LayoutParams(42, 54))
+        }, LinearLayout.LayoutParams(50, 60))
 
         tabStrip = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -277,7 +277,7 @@ class MainActivity : Activity() {
         ))
         root.removeView(bottom)
         root.addView(bottom, LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            ViewGroup.LayoutParams.MATCH_PARENT, 66
         ))
 
         setContentView(root)
@@ -445,7 +445,7 @@ class MainActivity : Activity() {
 
                 val close = TextView(this).apply {
                     text = "×"
-                    textSize = 25f
+                    textSize = 31f
                     includeFontPadding = false
                     gravity = Gravity.CENTER
                     translationY = -1f
@@ -599,7 +599,7 @@ class MainActivity : Activity() {
             dialog.setTitle("Sekmeler")
             render()
         }).apply { textSize = 12f; minWidth = 0; setPadding(4, 13, 4, 13) },
-            LinearLayout.LayoutParams(0, 48, 1f).apply { rightMargin = 5 })
+            LinearLayout.LayoutParams(0, 54, 1f).apply { rightMargin = 5 })
 
         modeBar.addView(sectionButton(
             "Gizli Alan (${privateTabs.size})", showingPrivate, {
@@ -607,7 +607,7 @@ class MainActivity : Activity() {
             dialog.setTitle("Gizli Alan")
             render()
         }).apply { textSize = 12f; minWidth = 0; setPadding(4, 13, 4, 13) },
-            LinearLayout.LayoutParams(0, 48, 1f).apply { leftMargin = 5 })
+            LinearLayout.LayoutParams(0, 54, 1f).apply { leftMargin = 5 })
 
         dialog.setView(scroll)
         render()
