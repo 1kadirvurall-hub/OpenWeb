@@ -409,8 +409,7 @@ class MainActivity : Activity() {
             </style>
             </head>
             <body><main class="wrap">
-            <div class="logo">◎</div>
-            <h1>OpenWeb</h1>
+            <div class="brand"><div class="logo">◉</div><h1>Ana Sayfa</h1></div>
             <p class="tagline">Dünyayı keşfet, özgürce gezin.</p>
             <form action="https://www.google.com/search" method="get">
             <input name="q" placeholder="Ara veya web adresi yaz..." autocomplete="off">
