@@ -293,9 +293,11 @@ class MainActivity : Activity() {
     private fun makeTabCountButton(top: Boolean): TextView {
         val count = tabs.count { it !in privateTabs }
         return TextView(this).apply {
-            text = "▢\n$count"
+            text = "▢ $count"
             textSize = if (top) 14f else 17f
             gravity = Gravity.CENTER
+            minWidth = if (top) 48 else 56
+            setPadding(6, 0, 6, 0)
             setTextColor(accent)
             contentDescription = "Normal sekmeler: $count"
             setOnClickListener { showTabsMenu() }
@@ -306,11 +308,11 @@ class MainActivity : Activity() {
     private fun updateTabCounts() {
         val count = tabs.count { it !in privateTabs }
         topTabCountButton?.apply {
-            text = "▢\n$count"
+            text = "▢ $count"
             contentDescription = "Normal sekmeler: $count"
         }
         bottomTabCountButton?.apply {
-            text = "▢\n$count"
+            text = "▢ $count"
             contentDescription = "Normal sekmeler: $count"
         }
     }
@@ -582,7 +584,7 @@ class MainActivity : Activity() {
 
         modeBar.addView(sectionButton(
             "Sekmeler (${tabs.count { it !in privateTabs }})", !showingPrivate
-        ) {
+        ).apply { textSize = 12f; minWidth = 0; setPadding(4, 13, 4, 13) } {
             showingPrivate = false
             dialog.setTitle("Sekmeler")
             render()
@@ -590,7 +592,7 @@ class MainActivity : Activity() {
 
         modeBar.addView(sectionButton(
             "Gizli Alan (${privateTabs.size})", showingPrivate
-        ) {
+        ).apply { textSize = 12f; minWidth = 0; setPadding(4, 13, 4, 13) } {
             showingPrivate = true
             dialog.setTitle("Gizli Alan")
             render()
