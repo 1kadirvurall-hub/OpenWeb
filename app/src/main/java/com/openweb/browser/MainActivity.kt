@@ -23,6 +23,7 @@ import android.widget.*
 class MainActivity : Activity() {
     private lateinit var web: WebView
     private val tabs = mutableListOf<WebView>()
+    private val privateTabs = mutableSetOf<WebView>()
     private var activeTab = 0
     private lateinit var address: EditText
     private lateinit var progress: ProgressBar
@@ -352,6 +353,37 @@ class MainActivity : Activity() {
         Toast.makeText(this, "Yeni sekme açıldı", Toast.LENGTH_SHORT).show()
     }
 
+    private fun addPrivateTab() {
+        val tab = WebView(this).apply {
+            setBackgroundColor(Color.BLACK)
+            settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
+            settings.cacheMode = android.webkit.WebSettings.LOAD_NO_CACHE
+            clearCache(true)
+            clearHistory()
+            webViewClient = object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(view: WebView, url: String) = handleUrl(url)
+                override fun onPageFinished(view: WebView, url: String) {
+                    if (view === web && !url.startsWith("data:")) address.setText(url)
+                }
+            }
+            webChromeClient = WebChromeClient()
+        }
+        val root = window.decorView.findViewById<ViewGroup>(android.R.id.content)
+            .getChildAt(0) as ViewGroup
+        (web.parent as? ViewGroup)?.removeView(web)
+        root.addView(tab, 2, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f
+        ))
+        tabs.add(tab)
+        privateTabs.add(tab)
+        android.webkit.CookieManager.getInstance().setAcceptCookie(false)
+        web = tab
+        activeTab = tabs.lastIndex
+        loadHome()
+        Toast.makeText(this, "Gizli sekme açıldı", Toast.LENGTH_SHORT).show()
+    }
+
     private fun switchTab(index: Int) {
         if (index !in tabs.indices) return
         val root = window.decorView.findViewById<ViewGroup>(android.R.id.content)
@@ -359,6 +391,8 @@ class MainActivity : Activity() {
         (web.parent as? ViewGroup)?.removeView(web)
         web = tabs[index]
         activeTab = index
+        android.webkit.CookieManager.getInstance().setAcceptCookie(!privateTabs.contains(web))
+        web.settings.domStorageEnabled = !privateTabs.contains(web)
         (web.parent as? ViewGroup)?.removeView(web)
         root.addView(web, 2, LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f
@@ -475,7 +509,7 @@ class MainActivity : Activity() {
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> Toast.makeText(this, "Yeni sekme özelliğini sonraki adımda ekleyeceğiz.", Toast.LENGTH_SHORT).show()
-                    1 -> Toast.makeText(this, "Gizli gezinme özelliğini sonraki adımda ekleyeceğiz.", Toast.LENGTH_SHORT).show()
+                    1 -> addPrivateTab()
                     2 -> Toast.makeText(this, "Uzantı desteğini sonraki adımda ele alacağız.", Toast.LENGTH_SHORT).show()
                     3 -> web.reload()
                     4 -> startActivity(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS))
