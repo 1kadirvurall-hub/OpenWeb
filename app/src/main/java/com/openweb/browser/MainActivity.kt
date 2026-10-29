@@ -21,6 +21,8 @@ import android.webkit.URLUtil
 import android.widget.*
 
 class MainActivity : Activity() {
+    private lateinit var tabStrip: LinearLayout
+
     private lateinit var web: WebView
     private val tabs = mutableListOf<WebView>()
     private val privateTabs = mutableSetOf<WebView>()
@@ -214,7 +216,7 @@ class MainActivity : Activity() {
             showBrowserMenu()
         }, LinearLayout.LayoutParams(0, 52, 1f))
 
-        val tabStrip = LinearLayout(this).apply {
+        tabStrip = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setPadding(4, 6, 4, 6)
@@ -224,7 +226,7 @@ class MainActivity : Activity() {
         val tabScroll = android.widget.HorizontalScrollView(this).apply {
             isHorizontalScrollBarEnabled = false
             clipToPadding = false
-            addView(tabStrip, android.widget.HorizontalScrollView.LayoutParams(
+            addView(tabStrip, ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT
             ))
         }
@@ -412,7 +414,7 @@ class MainActivity : Activity() {
                     maxLines = 1
                     ellipsize = android.text.TextUtils.TruncateAt.END
                     setOnClickListener { switchTab(i) }
-                }, LinearLayout.LayoutParams(WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+                }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
 
                 item.addView(TextView(this).apply {
                     text = "×"
@@ -424,7 +426,7 @@ class MainActivity : Activity() {
 
                 item.setOnClickListener { switchTab(i) }
                 tabStrip.addView(item, LinearLayout.LayoutParams(
-                    WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT
                 ).apply { rightMargin = 6 })
             }
 
@@ -435,7 +437,7 @@ class MainActivity : Activity() {
                 setTextColor(accent)
                 setPadding(12, 0, 12, 0)
                 setOnClickListener { addTab() }
-            }, LinearLayout.LayoutParams(WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT))
+            }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT))
         }
 
 
