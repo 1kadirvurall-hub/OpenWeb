@@ -256,20 +256,70 @@ class MainActivity : Activity() {
 
 
     private fun showTabsMenu() {
-        val labels = tabs.mapIndexed { i, tab ->
-            "${if (i == activeTab) "✓ " else ""}${tab.title?.takeIf { it.isNotBlank() } ?: "Yeni sekme"}"
-        }.toMutableList()
-        labels.add("＋ Yeni sekme")
-        labels.add("× Geçerli sekmeyi kapat")
-        android.app.AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-            .setTitle("Sekmeler (${tabs.size})")
-            .setItems(labels.toTypedArray()) { _, which ->
-                when {
-                    which < tabs.size -> switchTab(which)
-                    which == tabs.size -> addTab()
-                    else -> closeTab(activeTab)
+        val content = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(20, 8, 20, 8)
+            setBackgroundColor(bg)
+        }
+
+        val dialog = android.app.AlertDialog.Builder(
+            this, android.R.style.Theme_Material_Dialog_Alert
+        ).setTitle("Sekmeler (${tabs.size})")
+            .setView(content)
+            .setNegativeButton("Kapat", null)
+            .create()
+
+        tabs.forEachIndexed { i, tab ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(8, 4, 4, 4)
+                background = rounded(panel, 14f)
+            }
+
+            val name = TextView(this).apply {
+                text = "${if (i == activeTab) "✓ " else ""}${tab.title?.takeIf { it.isNotBlank() && it != "about:blank" } ?: "Ana Sayfa"}"
+                textSize = 15f
+                setTextColor(Color.WHITE)
+                setPadding(10, 12, 4, 12)
+                maxLines = 1
+                ellipsize = android.text.TextUtils.TruncateAt.END
+                setOnClickListener {
+                    dialog.dismiss()
+                    switchTab(i)
                 }
-            }.show()
+            }
+            row.addView(name, LinearLayout.LayoutParams(0, -2, 1f))
+
+            val close = TextView(this).apply {
+                text = "×"
+                textSize = 25f
+                gravity = Gravity.CENTER
+                setTextColor(Color.rgb(255, 110, 110))
+                setPadding(14, 4, 14, 4)
+                setOnClickListener {
+                    dialog.dismiss()
+                    closeTab(i)
+                }
+            }
+            row.addView(close)
+            content.addView(row, LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { bottomMargin = 8 })
+        }
+
+        val add = TextView(this).apply {
+            text = "＋  Yeni sekme"
+            textSize = 16f
+            setTextColor(accent)
+            setPadding(12, 14, 12, 14)
+            setOnClickListener {
+                dialog.dismiss()
+                addTab()
+            }
+        }
+        content.addView(add)
+        dialog.show()
     }
 
     private fun addTab() {
@@ -337,10 +387,10 @@ class MainActivity : Activity() {
             body{margin:0;background:radial-gradient(circle at 50% 25%,#142b49 0,#080d18 58%);
             color:#f0f5ff;font-family:Arial,sans-serif;min-height:100vh}
             .wrap{width:100%;max-width:620px;margin:auto;padding:52px 22px 30px;text-align:center}
-            .logo{width:76px;height:76px;margin:0 auto 18px;border-radius:26px;
+            .brand{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 auto 18px}.logo{width:56px;height:56px;flex-shrink:0;margin:0;border-radius:20px;
             display:grid;place-items:center;background:#111d30;border:1px solid #294566;
-            color:#36c9f0;font-size:43px;box-shadow:0 10px 35px #0005}
-            h1{font-size:32px;letter-spacing:.4px;margin:0}
+            color:#36c9f0;font-size:32px;box-shadow:0 10px 35px #0005}
+            h1{font-size:29px;letter-spacing:.4px;margin:0}
             .tagline{color:#91a4c0;margin:10px 0 32px;font-size:14px}
             form{display:flex;align-items:center;background:#111d30;border:1px solid #29405d;
             border-radius:22px;padding:7px 8px 7px 18px;gap:8px;box-shadow:0 8px 25px #0003}
