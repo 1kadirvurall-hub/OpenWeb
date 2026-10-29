@@ -60,7 +60,7 @@ class MainActivity : Activity() {
         addressBarAtBottom = prefs.getBoolean("address_bottom", false)
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(14, 8, 14, 64)
+            setPadding(14, 8, 14, 48)
             setBackgroundColor(bg)
         }
 
@@ -204,23 +204,23 @@ class MainActivity : Activity() {
 
         bottom.addView(makeNavButton("‹", "Geri") {
             if (web.canGoBack()) web.goBack()
-        }, LinearLayout.LayoutParams(0, 56, 1f))
+        }, LinearLayout.LayoutParams(0, 62, 1f))
 
         bottom.addView(makeNavButton("›", "İleri") {
             if (web.canGoForward()) web.goForward()
-        }, LinearLayout.LayoutParams(0, 56, 1f))
+        }, LinearLayout.LayoutParams(0, 62, 1f))
 
         bottom.addView(makeNavButton("⌂", "Ana sayfa") {
             loadHome()
-        }, LinearLayout.LayoutParams(0, 56, 1f))
+        }, LinearLayout.LayoutParams(0, 62, 1f))
 
         bottom.addView(makeNavButton("▢", "Sekmeler") {
             showTabsMenu()
-        }, LinearLayout.LayoutParams(0, 56, 1f))
+        }, LinearLayout.LayoutParams(0, 62, 1f))
 
         bottom.addView(makeNavButton("⋮", "Menü") {
             showBrowserMenu()
-        }, LinearLayout.LayoutParams(0, 56, 1f))
+        }, LinearLayout.LayoutParams(0, 62, 1f))
 
         tabStrip = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -282,9 +282,9 @@ class MainActivity : Activity() {
         return TextView(this).apply {
             text = symbol
             contentDescription = description
-            textSize = 32f
+            textSize = 36f
             gravity = Gravity.CENTER
-            setTextColor(accent)
+            setTextColor(Color.rgb(10, 132, 255))
             setOnClickListener { action() }
         }
     }
