@@ -90,7 +90,7 @@ class MainActivity : Activity() {
         header.addView(titleBox, LinearLayout.LayoutParams(0, -2, 1f))
 
         header.addView(makeIconButton("▢", "Sekmeler") {
-            Toast.makeText(this, "Sekmeler özelliğini sonraki adımda ekleyeceğiz.", Toast.LENGTH_SHORT).show()
+            showTabsMenu()
         })
         header.addView(makeIconButton("⋮", "Menü") {
             showBrowserMenu()
@@ -198,23 +198,23 @@ class MainActivity : Activity() {
 
         bottom.addView(makeNavButton("‹", "Geri") {
             if (web.canGoBack()) web.goBack()
-        }, LinearLayout.LayoutParams(0, 52, 1f))
+        }, LinearLayout.LayoutParams(0, 62, 1f))
 
         bottom.addView(makeNavButton("›", "İleri") {
             if (web.canGoForward()) web.goForward()
-        }, LinearLayout.LayoutParams(0, 52, 1f))
+        }, LinearLayout.LayoutParams(0, 62, 1f))
 
         bottom.addView(makeNavButton("⌂", "Ana sayfa") {
             loadHome()
-        }, LinearLayout.LayoutParams(0, 52, 1f))
+        }, LinearLayout.LayoutParams(0, 62, 1f))
 
         bottom.addView(makeNavButton("▢", "Sekmeler") {
             showTabsMenu()
-        }, LinearLayout.LayoutParams(0, 52, 1f))
+        }, LinearLayout.LayoutParams(0, 62, 1f))
 
         bottom.addView(makeNavButton("⋮", "Menü") {
             showBrowserMenu()
-        }, LinearLayout.LayoutParams(0, 52, 1f))
+        }, LinearLayout.LayoutParams(0, 62, 1f))
 
         tabStrip = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -261,12 +261,12 @@ class MainActivity : Activity() {
         return TextView(this).apply {
             text = symbol
             contentDescription = description
-            textSize = 23f
+            textSize = 29f
             gravity = Gravity.CENTER
             setTextColor(accent)
             background = rounded(Color.TRANSPARENT, 30f)
             setOnClickListener { action() }
-            layoutParams = LinearLayout.LayoutParams(42, 44)
+            layoutParams = LinearLayout.LayoutParams(54, 54)
         }
     }
 
@@ -276,7 +276,7 @@ class MainActivity : Activity() {
         return TextView(this).apply {
             text = symbol
             contentDescription = description
-            textSize = 27f
+            textSize = 32f
             gravity = Gravity.CENTER
             setTextColor(accent)
             setOnClickListener { action() }
@@ -564,29 +564,107 @@ class MainActivity : Activity() {
             background:#36c9f0;color:#081426;font-size:23px;font-weight:bold}
             .section{margin:30px 0 14px;text-align:left;font-size:14px;font-weight:bold;color:#d5e2f8}
             .links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-            a{background:#000000;border:1px solid #222222;
-            border-radius:20px;padding:19px 5px;color:#d5e2f8;text-decoration:none;font-size:13px}
-            a:active{background:#151515}
+            .quick{position:relative;background:#000;border:1px solid #292929;
+            border-radius:20px;min-height:94px;padding:16px 4px 12px;
+            color:#d5e2f8;text-decoration:none;font-size:13px;
+            display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px}
+            .quick:active{background:#151515}
+            .quick img{width:32px;height:32px;object-fit:contain;border-radius:8px}
+            .quick .remove{position:absolute;right:5px;top:3px;width:23px;height:23px;
+            border:0;border-radius:50%;background:#252525;color:#fff;font-size:15px;padding:0}
+            .add{background:#07131b;border:1px dashed #36c9f0;border-radius:20px;
+            min-height:94px;color:#36c9f0;font-size:30px;display:flex;
+            align-items:center;justify-content:center}
             .symbol{display:block;font-size:27px;margin-bottom:12px;color:#36c9f0}
             .foot{margin-top:34px;color:#627895;font-size:12px}
             </style>
             </head>
             <body><main class="wrap">
-            <div class="brand"><div class="logo">◉</div><h1>Ana Sayfa</h1></div>
+            <div class="brand"><div class="logo">◉</div><h1>OpenWeb</h1></div>
             <p class="tagline">Dünyayı keşfet, özgürce gezin.</p>
             <form action="https://www.google.com/search" method="get">
             <input name="q" placeholder="Ara veya web adresi yaz..." autocomplete="off">
             <button type="submit" aria-label="Ara">➜</button>
             </form>
             <div class="section">Hızlı erişim</div>
-            <div class="links">
-            <a href="https://www.google.com"><span class="symbol">⌕</span>Google</a>
-            <a href="https://www.youtube.com"><span class="symbol">▶</span>YouTube</a>
-            <a href="https://www.wikipedia.org"><span class="symbol">◈</span>Wikipedia</a>
-            <a href="https://www.reddit.com"><span class="symbol">◉</span>Reddit</a>
-            <a href="https://github.com"><span class="symbol">⌘</span>GitHub</a>
-            <a href="https://www.bing.com"><span class="symbol">◇</span>Bing</a>
-            </div>
+            <div class="links" id="quickLinks"></div>
+            <script>
+            (function(){
+              const key = "openweb_quick_links";
+              const defaults = [
+                {name:"Google",url:"https://www.google.com"},
+                {name:"YouTube",url:"https://www.youtube.com"},
+                {name:"Wikipedia",url:"https://www.wikipedia.org"},
+                {name:"Reddit",url:"https://www.reddit.com"},
+                {name:"GitHub",url:"https://github.com"},
+                {name:"Bing",url:"https://www.bing.com"}
+              ];
+              let sites;
+              try { sites = JSON.parse(localStorage.getItem(key)) || defaults; }
+              catch(e) { sites = defaults; }
+              const host = document.getElementById("quickLinks");
+              function draw(){
+                host.innerHTML = "";
+                sites.forEach(function(site,index){
+                  const a = document.createElement("a");
+                  a.className = "quick";
+                  a.href = site.url;
+                  const img = document.createElement("img");
+                  try {
+                    const u = new URL(site.url);
+                    img.src = "https://www.google.com/s2/favicons?domain=" +
+                      encodeURIComponent(u.hostname) + "&sz=128";
+                  } catch(e) { img.alt = "🌐"; }
+                  img.alt = "";
+                  img.onerror = function(){ this.style.display="none"; };
+                  const label = document.createElement("span");
+                  label.textContent = site.name;
+                  const remove = document.createElement("button");
+                  remove.className = "remove";
+                  remove.type = "button";
+                  remove.textContent = "×";
+                  remove.setAttribute("aria-label","Kısayolu sil");
+                  remove.onclick = function(ev){
+                    ev.preventDefault(); ev.stopPropagation();
+                    sites.splice(index,1);
+                    save();
+                  };
+                  a.appendChild(img); a.appendChild(label); a.appendChild(remove);
+                  host.appendChild(a);
+                });
+                const add = document.createElement("button");
+                add.className = "add";
+                add.type = "button";
+                add.textContent = "+";
+                add.setAttribute("aria-label","Site ekle");
+                add.onclick = function(){
+                  let url = prompt("Eklenecek sitenin adresi:");
+                  if(!url) return;
+                  url = url.trim();
+                  if(!/^https?:\/\//i.test(url)) url = "https://" + url;
+                  try {
+                    const parsed = new URL(url);
+                    if(!/^https?:$/.test(parsed.protocol)) throw new Error();
+                    url = parsed.href;
+                  } catch(e) {
+                    alert("Geçerli bir web adresi gir.");
+                    return;
+                  }
+                  const name = prompt("Site adı:", new URL(url).hostname.replace(/^www\./,""));
+                  if(name === null) return;
+                  sites.push({name:name.trim() || new URL(url).hostname,url:url});
+                  save();
+                };
+                host.appendChild(add);
+              }
+              function save(){
+                try { localStorage.setItem(key,JSON.stringify(sites)); }
+                catch(e) {}
+                draw();
+              }
+              draw();
+            })();
+            </script>
             <div class="foot">OpenWeb · Özgürce keşfet.</div>
             </main></body></html>
         """.trimIndent()
