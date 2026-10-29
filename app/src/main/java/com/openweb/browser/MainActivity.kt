@@ -60,7 +60,7 @@ class MainActivity : Activity() {
         addressBarAtBottom = prefs.getBoolean("address_bottom", false)
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(14, 8, 14, 48)
+            setPadding(14, 8, 14, 110)
             setBackgroundColor(bg)
         }
 
@@ -516,7 +516,7 @@ class MainActivity : Activity() {
                 orientation = LinearLayout.VERTICAL
                 gravity = Gravity.CENTER
                 setPadding(8, 8, 8, 8)
-                background = rounded(Color.rgb(24, 30, 40), 18f)
+                background = rounded(Color.rgb(10, 132, 255), 18f)
                 setOnClickListener {
                     dialog.dismiss()
                     if (showingPrivate) addPrivateTab() else addTab()
