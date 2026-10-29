@@ -184,7 +184,7 @@ class MainActivity : Activity() {
         val bottom = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
-            background = rounded(Color.rgb(16, 26, 43), 24f)
+            background = rounded(Color.BLACK, 24f)
             setPadding(4, 4, 4, 4)
         }
 
@@ -388,15 +388,15 @@ class MainActivity : Activity() {
             <meta name="color-scheme" content="dark">
             <style>
             *{box-sizing:border-box}
-            body{margin:0;background:radial-gradient(circle at 50% 25%,#142b49 0,#080d18 58%);
+            body{margin:0;background:#000000;
             color:#f0f5ff;font-family:Arial,sans-serif;min-height:100vh}
             .wrap{width:100%;max-width:620px;margin:auto;padding:52px 22px 30px;text-align:center}
             .brand{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 auto 18px}.logo{width:56px;height:56px;flex-shrink:0;margin:0;border-radius:20px;
-            display:grid;place-items:center;background:#111d30;border:1px solid #294566;
+            display:grid;place-items:center;background:#000000;border:1px solid #222222;
             color:#36c9f0;font-size:32px;box-shadow:0 10px 35px #0005}
             h1{font-size:29px;letter-spacing:.4px;margin:0}
             .tagline{color:#91a4c0;margin:10px 0 32px;font-size:14px}
-            form{display:flex;align-items:center;background:#111d30;border:1px solid #29405d;
+            form{display:flex;align-items:center;background:#000000;border:1px solid #222222;
             border-radius:22px;padding:7px 8px 7px 18px;gap:8px;box-shadow:0 8px 25px #0003}
             input{flex:1;min-width:0;background:transparent;border:0;outline:0;
             color:#f0f5ff;font-size:16px;padding:12px 0}
@@ -405,9 +405,9 @@ class MainActivity : Activity() {
             background:#36c9f0;color:#081426;font-size:23px;font-weight:bold}
             .section{margin:30px 0 14px;text-align:left;font-size:14px;font-weight:bold;color:#d5e2f8}
             .links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-            a{background:linear-gradient(145deg,#14243a,#101a2b);border:1px solid #203651;
+            a{background:#000000;border:1px solid #222222;
             border-radius:20px;padding:19px 5px;color:#d5e2f8;text-decoration:none;font-size:13px}
-            a:active{background:#203956}
+            a:active{background:#151515}
             .symbol{display:block;font-size:27px;margin-bottom:12px;color:#36c9f0}
             .foot{margin-top:34px;color:#627895;font-size:12px}
             </style>
