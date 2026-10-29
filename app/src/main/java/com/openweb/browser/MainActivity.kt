@@ -583,20 +583,20 @@ class MainActivity : Activity() {
             }
 
         modeBar.addView(sectionButton(
-            "Sekmeler (${tabs.count { it !in privateTabs }})", !showingPrivate
-        ).apply { textSize = 12f; minWidth = 0; setPadding(4, 13, 4, 13) } {
+            "Sekmeler (${tabs.count { it !in privateTabs }})", !showingPrivate, {
             showingPrivate = false
             dialog.setTitle("Sekmeler")
             render()
-        }, LinearLayout.LayoutParams(0, 48, 1f).apply { rightMargin = 5 })
+        }).apply { textSize = 12f; minWidth = 0; setPadding(4, 13, 4, 13) },
+            LinearLayout.LayoutParams(0, 48, 1f).apply { rightMargin = 5 })
 
         modeBar.addView(sectionButton(
-            "Gizli Alan (${privateTabs.size})", showingPrivate
-        ).apply { textSize = 12f; minWidth = 0; setPadding(4, 13, 4, 13) } {
+            "Gizli Alan (${privateTabs.size})", showingPrivate, {
             showingPrivate = true
             dialog.setTitle("Gizli Alan")
             render()
-        }, LinearLayout.LayoutParams(0, 48, 1f).apply { leftMargin = 5 })
+        }).apply { textSize = 12f; minWidth = 0; setPadding(4, 13, 4, 13) },
+            LinearLayout.LayoutParams(0, 48, 1f).apply { leftMargin = 5 })
 
         dialog.setView(scroll)
         render()
