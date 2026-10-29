@@ -262,8 +262,12 @@ class MainActivity : Activity() {
             }, LinearLayout.LayoutParams(44, 42))
         }
 
-        root.addView(tabStrip, root.indexOfChild(bottom), LinearLayout.LayoutParams(
+        root.addView(tabStrip, LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, 48
+        ))
+        root.removeView(bottom)
+        root.addView(bottom, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         ))
 
         setContentView(root)
