@@ -264,8 +264,8 @@ class MainActivity : Activity() {
     private fun showTabsMenu() {
         val content = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(20, 8, 20, 8)
-            setBackgroundColor(bg)
+            setPadding(12, 8, 12, 8)
+            setBackgroundColor(Color.BLACK)
         }
 
         val dialog = android.app.AlertDialog.Builder(
@@ -275,61 +275,95 @@ class MainActivity : Activity() {
             .setNegativeButton("Kapat", null)
             .create()
 
-        tabs.forEachIndexed { i, tab ->
-            val row = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER_VERTICAL
-                setPadding(8, 4, 4, 4)
-                background = rounded(panel, 14f)
-            }
+        val grid = android.widget.GridLayout(this).apply {
+            columnCount = 2
+            setBackgroundColor(Color.BLACK)
+        }
 
-            val name = TextView(this).apply {
-                text = "${if (i == activeTab) "✓ " else ""}${tab.title?.takeIf { it.isNotBlank() && it != "about:blank" } ?: "Ana Sayfa"}"
-                textSize = 15f
-                setTextColor(Color.WHITE)
-                setPadding(10, 12, 4, 12)
-                maxLines = 1
-                ellipsize = android.text.TextUtils.TruncateAt.END
+        tabs.forEachIndexed { i, tab ->
+            val card = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(12, 10, 12, 10)
+                background = rounded(
+                    if (i == activeTab) Color.rgb(28, 35, 48) else Color.rgb(15, 15, 15),
+                    16f
+                )
                 setOnClickListener {
                     dialog.dismiss()
                     switchTab(i)
                 }
             }
-            row.addView(name, LinearLayout.LayoutParams(0, -2, 1f))
 
-            val close = TextView(this).apply {
+            val top = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+            }
+
+            top.addView(TextView(this).apply {
+                text = if (i == activeTab) "●" else "○"
+                textSize = 13f
+                setTextColor(if (i == activeTab) accent else Color.GRAY)
+            })
+
+            top.addView(View(this), LinearLayout.LayoutParams(0, 1, 1f))
+            top.addView(TextView(this).apply {
                 text = "×"
-                textSize = 25f
+                textSize = 23f
                 gravity = Gravity.CENTER
                 setTextColor(Color.rgb(255, 110, 110))
-                setPadding(14, 4, 14, 4)
+                setPadding(8, 0, 0, 0)
                 setOnClickListener {
                     dialog.dismiss()
                     closeTab(i)
                 }
+            })
+            card.addView(top)
+
+            card.addView(TextView(this).apply {
+                text = tab.title?.takeIf { it.isNotBlank() && it != "about:blank" }
+                    ?: "Yeni sekme"
+                textSize = 14f
+                setTextColor(Color.WHITE)
+                maxLines = 2
+                ellipsize = android.text.TextUtils.TruncateAt.END
+                setPadding(0, 10, 0, 6)
+            })
+
+            card.addView(TextView(this).apply {
+                text = tab.url?.takeIf { it.isNotBlank() && it != "about:blank" }
+                    ?.removePrefix("https://")?.removePrefix("http://")
+                    ?: "Ana sayfa"
+                textSize = 11f
+                setTextColor(Color.LTGRAY)
+                maxLines = 2
+                ellipsize = android.text.TextUtils.TruncateAt.END
+            })
+
+            val params = android.widget.GridLayout.LayoutParams().apply {
+                width = 0
+                height = 132
+                columnSpec = android.widget.GridLayout.spec(i % 2, 1f)
+                setMargins(5, 5, 5, 5)
             }
-            row.addView(close)
-            content.addView(row, LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply { bottomMargin = 8 })
+            grid.addView(card, params)
         }
 
-        val add = TextView(this).apply {
+        content.addView(grid)
+        content.addView(TextView(this).apply {
             text = "＋  Yeni sekme"
             textSize = 16f
+            gravity = Gravity.CENTER
             setTextColor(accent)
-            setPadding(12, 14, 12, 14)
+            setPadding(12, 16, 12, 12)
             setOnClickListener {
                 dialog.dismiss()
                 addTab()
             }
-        }
-        content.addView(add)
+        })
+
         dialog.show()
         dialog.window?.setBackgroundDrawableResource(android.R.color.black)
-        dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)?.apply {
-            setTextColor(accent)
-        }
+        dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)?.setTextColor(accent)
     }
 
     private fun addTab() {
