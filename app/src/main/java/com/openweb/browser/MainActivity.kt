@@ -22,6 +22,8 @@ import android.widget.*
 
 class MainActivity : Activity() {
     private lateinit var web: WebView
+    private val tabs = mutableListOf<WebView>()
+    private var activeTab = 0
     private lateinit var address: EditText
     private lateinit var progress: ProgressBar
 
@@ -174,6 +176,7 @@ class MainActivity : Activity() {
             }
         }
 
+        tabs.add(web)
         root.addView(web, LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f
         ))
@@ -198,7 +201,7 @@ class MainActivity : Activity() {
         }, LinearLayout.LayoutParams(0, 52, 1f))
 
         bottom.addView(makeNavButton("▢", "Sekmeler") {
-            Toast.makeText(this, "Sekmeler özelliğini sonraki adımda ekleyeceğiz.", Toast.LENGTH_SHORT).show()
+            showTabsMenu()
         }, LinearLayout.LayoutParams(0, 52, 1f))
 
         bottom.addView(makeNavButton("⋮", "Menü") {
@@ -249,6 +252,76 @@ class MainActivity : Activity() {
             setTextColor(accent)
             setOnClickListener { action() }
         }
+    }
+
+
+    private fun showTabsMenu() {
+        val labels = tabs.mapIndexed { i, tab ->
+            "${if (i == activeTab) "✓ " else ""}${tab.title?.takeIf { it.isNotBlank() } ?: "Yeni sekme"}"
+        }.toMutableList()
+        labels.add("＋ Yeni sekme")
+        labels.add("× Geçerli sekmeyi kapat")
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Sekmeler (${tabs.size})")
+            .setItems(labels.toTypedArray()) { _, which ->
+                when {
+                    which < tabs.size -> switchTab(which)
+                    which == tabs.size -> addTab()
+                    else -> closeTab(activeTab)
+                }
+            }.show()
+    }
+
+    private fun addTab() {
+        val tab = WebView(this).apply {
+            setBackgroundColor(bg)
+            settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
+            webViewClient = object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(view: WebView, url: String) = handleUrl(url)
+                override fun onPageFinished(view: WebView, url: String) {
+                    if (view === web && !url.startsWith("data:")) address.setText(url)
+                }
+            }
+            webChromeClient = WebChromeClient()
+        }
+        val root = window.decorView.findViewById<ViewGroup>(android.R.id.content)
+            .getChildAt(0) as ViewGroup
+        (web.parent as? ViewGroup)?.removeView(web)
+        root.addView(tab, 2, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f
+        ))
+        tabs.add(tab)
+        web = tab
+        activeTab = tabs.lastIndex
+        loadHome()
+        Toast.makeText(this, "Yeni sekme açıldı", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun switchTab(index: Int) {
+        if (index !in tabs.indices) return
+        val root = window.decorView.findViewById<ViewGroup>(android.R.id.content)
+            .getChildAt(0) as ViewGroup
+        (web.parent as? ViewGroup)?.removeView(web)
+        web = tabs[index]
+        activeTab = index
+        (web.parent as? ViewGroup)?.removeView(web)
+        root.addView(web, 2, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f
+        ))
+        address.setText(web.url ?: "")
+    }
+
+    private fun closeTab(index: Int) {
+        if (tabs.size <= 1) {
+            loadHome()
+            return
+        }
+        val closing = tabs.removeAt(index)
+        (closing.parent as? ViewGroup)?.removeView(closing)
+        closing.destroy()
+        activeTab = (index - 1).coerceAtLeast(0)
+        switchTab(activeTab)
     }
 
     private fun loadHome() {
