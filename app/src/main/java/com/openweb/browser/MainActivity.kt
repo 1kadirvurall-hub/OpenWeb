@@ -30,6 +30,7 @@ class MainActivity : Activity() {
 
     private val bg = Color.BLACK
     private val panel = Color.BLACK
+    private val privateBg = Color.rgb(8, 13, 24)
     private val accent = Color.rgb(190, 210, 245)
     private val muted = Color.rgb(145, 164, 192)
 
@@ -377,6 +378,7 @@ class MainActivity : Activity() {
         ))
         tabs.add(tab)
         privateTabs.add(tab)
+        tab.setBackgroundColor(privateBg)
         android.webkit.CookieManager.getInstance().setAcceptCookie(false)
         web = tab
         activeTab = tabs.lastIndex
@@ -391,6 +393,11 @@ class MainActivity : Activity() {
         (web.parent as? ViewGroup)?.removeView(web)
         web = tabs[index]
         activeTab = index
+        val privateMode = privateTabs.contains(web)
+        val rootView = root
+        rootView.setBackgroundColor(if (privateMode) privateBg else bg)
+        rootView.getChildAt(1)?.background = rounded(if (privateMode) privateBg else panel, 40f)
+        web.setBackgroundColor(if (privateMode) privateBg else bg)
         android.webkit.CookieManager.getInstance().setAcceptCookie(!privateTabs.contains(web))
         web.settings.domStorageEnabled = !privateTabs.contains(web)
         (web.parent as? ViewGroup)?.removeView(web)
@@ -421,6 +428,7 @@ class MainActivity : Activity() {
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <meta name="color-scheme" content="dark">
             <style>
+            ${if (privateTabs.contains(web)) "body{background:#080d18!important}.logo,form,a{background:#101a2b!important;border-color:#203651!important}button{background:#36c9f0!important;color:#081426!important}a:active{background:#203956!important}" else ""}
             *{box-sizing:border-box}
             body{margin:0;background:#000000;
             color:#f0f5ff;font-family:Arial,sans-serif;min-height:100vh}
