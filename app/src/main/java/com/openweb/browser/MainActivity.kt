@@ -263,7 +263,7 @@ class MainActivity : Activity() {
         }
 
         val dialog = android.app.AlertDialog.Builder(
-            this, android.R.style.Theme_Material_Dialog_Alert
+            this, android.R.style.Theme_Material_NoActionBar
         ).setTitle("Sekmeler (${tabs.size})")
             .setView(content)
             .setNegativeButton("Kapat", null)
@@ -320,6 +320,10 @@ class MainActivity : Activity() {
         }
         content.addView(add)
         dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)?.apply {
+            setTextColor(accent)
+        }
     }
 
     private fun addTab() {
