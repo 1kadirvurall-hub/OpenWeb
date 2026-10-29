@@ -482,6 +482,7 @@ class MainActivity : Activity() {
                 }
             }
             .create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.black)
         dialog.setOnShowListener {
             dialog.window?.setBackgroundDrawableResource(android.R.color.black)
             val titleId = resources.getIdentifier("alertTitle", "id", "android")
