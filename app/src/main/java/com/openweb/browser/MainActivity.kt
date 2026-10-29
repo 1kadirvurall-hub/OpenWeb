@@ -95,9 +95,7 @@ class MainActivity : Activity() {
         })
         header.addView(titleBox, LinearLayout.LayoutParams(0, -2, 1f))
 
-        header.addView(makeIconButton("▢", "Sekmeler") {
-            showTabsMenu()
-        })
+        header.addView(makeTabCountButton(true))
         header.addView(makeIconButton("⋮", "Menü") {
             showBrowserMenu()
         })
@@ -214,9 +212,8 @@ class MainActivity : Activity() {
             loadHome()
         }, LinearLayout.LayoutParams(0, 62, 1f))
 
-        bottom.addView(makeNavButton("▢", "Sekmeler") {
-            showTabsMenu()
-        }, LinearLayout.LayoutParams(0, 62, 1f))
+        bottom.addView(makeTabCountButton(false),
+            LinearLayout.LayoutParams(0, 62, 1f))
 
         bottom.addView(makeNavButton("⋮", "Menü") {
             showBrowserMenu()
@@ -290,10 +287,39 @@ class MainActivity : Activity() {
     }
 
 
+    private var topTabCountButton: TextView? = null
+    private var bottomTabCountButton: TextView? = null
+
+    private fun makeTabCountButton(top: Boolean): TextView {
+        val count = tabs.count { it !in privateTabs }
+        return TextView(this).apply {
+            text = "▢\n$count"
+            textSize = if (top) 14f else 17f
+            gravity = Gravity.CENTER
+            setTextColor(accent)
+            contentDescription = "Normal sekmeler: $count"
+            setOnClickListener { showTabsMenu() }
+            if (top) topTabCountButton = this else bottomTabCountButton = this
+        }
+    }
+
+    private fun updateTabCounts() {
+        val count = tabs.count { it !in privateTabs }
+        topTabCountButton?.apply {
+            text = "▢\n$count"
+            contentDescription = "Normal sekmeler: $count"
+        }
+        bottomTabCountButton?.apply {
+            text = "▢\n$count"
+            contentDescription = "Normal sekmeler: $count"
+        }
+    }
+
     private fun showTabsMenu() {
+        var showingPrivate = web in privateTabs
         val dialog = android.app.AlertDialog.Builder(
             this, android.R.style.Theme_Material_Dialog_Alert
-        ).setTitle("Sekmeler (${tabs.size})")
+        ).setTitle(if (showingPrivate) "Gizli Alan" else "Sekmeler")
             .setNegativeButton("Kapat", null)
             .create()
 
@@ -308,7 +334,17 @@ class MainActivity : Activity() {
             setPadding(8, 8, 8, 12)
             setBackgroundColor(Color.BLACK)
         }
-        scroll.addView(grid)
+        val content = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(Color.BLACK)
+        }
+        val modeBar = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(8, 10, 8, 10)
+        }
+        content.addView(modeBar)
+        content.addView(grid)
+        scroll.addView(content)
 
         fun render() {
             grid.removeAllViews()
@@ -328,7 +364,7 @@ class MainActivity : Activity() {
                 grid.addView(view, lp)
             }
 
-            tabs.toList().forEach { tab ->
+            tabs.toList().filter { (it in privateTabs) == showingPrivate }.forEach { tab ->
                 val index = tabs.indexOf(tab)
                 if (index < 0) return@forEach
 
@@ -407,7 +443,7 @@ class MainActivity : Activity() {
                     setOnClickListener {
                         val current = tabs.indexOf(tab)
                         if (current >= 0) closeTab(current)
-                        dialog.setTitle("Sekmeler (${tabs.size})")
+                        dialog.setTitle(if (showingPrivate) "Gizli Alan" else "Sekmeler")
                         render()
                     }
                 }
@@ -468,7 +504,7 @@ class MainActivity : Activity() {
                                     .withEndAction {
                                         val current = tabs.indexOf(tab)
                                         if (current >= 0) closeTab(current)
-                                        dialog.setTitle("Sekmeler (${tabs.size})")
+                                        dialog.setTitle(if (showingPrivate) "Gizli Alan" else "Sekmeler")
                                         render()
                                     }
                                     .start()
@@ -508,7 +544,7 @@ class MainActivity : Activity() {
                 background = rounded(Color.rgb(24, 30, 40), 18f)
                 setOnClickListener {
                     dialog.dismiss()
-                    addTab()
+                    if (showingPrivate) addPrivateTab() else addTab()
                 }
                 addView(TextView(this@MainActivity).apply {
                     text = "+"
@@ -519,7 +555,7 @@ class MainActivity : Activity() {
                     ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f
                 ))
                 addView(TextView(this@MainActivity).apply {
-                    text = "Yeni sekme"
+                    text = if (showingPrivate) "Yeni gizli sekme" else "Yeni sekme"
                     textSize = 14f
                     gravity = Gravity.CENTER
                     setTextColor(Color.WHITE)
@@ -529,6 +565,36 @@ class MainActivity : Activity() {
             }
             addTile(add)
         }
+
+        fun sectionButton(label: String, selected: Boolean, action: () -> Unit) =
+            TextView(this).apply {
+                text = label
+                gravity = Gravity.CENTER
+                textSize = 13f
+                setTextColor(Color.WHITE)
+                setPadding(10, 13, 10, 13)
+                background = rounded(
+                    if (selected) Color.rgb(43, 55, 75) else Color.rgb(24, 27, 33),
+                    12f
+                )
+                setOnClickListener { action() }
+            }
+
+        modeBar.addView(sectionButton(
+            "Sekmeler (${tabs.count { it !in privateTabs }})", !showingPrivate
+        ) {
+            showingPrivate = false
+            dialog.setTitle("Sekmeler")
+            render()
+        }, LinearLayout.LayoutParams(0, 48, 1f).apply { rightMargin = 5 })
+
+        modeBar.addView(sectionButton(
+            "Gizli Alan (${privateTabs.size})", showingPrivate
+        ) {
+            showingPrivate = true
+            dialog.setTitle("Gizli Alan")
+            render()
+        }, LinearLayout.LayoutParams(0, 48, 1f).apply { leftMargin = 5 })
 
         dialog.setView(scroll)
         render()
@@ -544,6 +610,7 @@ class MainActivity : Activity() {
     private fun refreshTabStrip() {
             tabStrip.removeAllViews()
             tabs.forEachIndexed { i, tab ->
+                if ((tab in privateTabs) != (web in privateTabs)) return@forEachIndexed
                 val label = tab.title?.takeIf { it.isNotBlank() && it != "about:blank" }
                     ?: tab.url?.takeIf { it.isNotBlank() && it != "about:blank" }
                         ?.substringAfter("://")?.substringBefore("/")?.removePrefix("www.")
@@ -597,6 +664,7 @@ class MainActivity : Activity() {
                 background = rounded(Color.rgb(35, 42, 55), 14f)
                 setOnClickListener { addTab() }
             }, LinearLayout.LayoutParams(72, 72).apply { leftMargin = 4 })
+            updateTabCounts()
         }
 
 
