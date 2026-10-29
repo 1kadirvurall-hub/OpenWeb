@@ -185,6 +185,7 @@ class MainActivity : Activity() {
         root.addView(web, LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f
         ))
+        if (addressBarAtBottom) root.addView(addressBar)
 
         val bottom = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
