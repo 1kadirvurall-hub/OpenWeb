@@ -233,7 +233,7 @@ class MainActivity : Activity() {
 
 
         root.addView(tabScroll, LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, 76
+            ViewGroup.LayoutParams.MATCH_PARENT, 96
         ))
         root.removeView(bottom)
         root.addView(bottom, LinearLayout.LayoutParams(
@@ -331,10 +331,11 @@ class MainActivity : Activity() {
             top.addView(View(this), LinearLayout.LayoutParams(0, 1, 1f))
             top.addView(TextView(this).apply {
                 text = "×"
-                textSize = 23f
+                textSize = 30f
                 gravity = Gravity.CENTER
                 setTextColor(Color.rgb(255, 110, 110))
-                setPadding(8, 0, 0, 0)
+                minimumWidth = 52
+                minimumHeight = 52
                 setOnClickListener {
                     dialog.dismiss()
                     closeTab(i)
@@ -364,7 +365,7 @@ class MainActivity : Activity() {
 
             val params = android.widget.GridLayout.LayoutParams().apply {
                 width = 0
-                height = 132
+                height = 172
                 columnSpec = android.widget.GridLayout.spec(i % 2, 1f)
                 setMargins(5, 5, 5, 5)
             }
@@ -401,7 +402,7 @@ class MainActivity : Activity() {
                     orientation = LinearLayout.HORIZONTAL
                     gravity = Gravity.CENTER_VERTICAL
                     setPadding(12, 4, 4, 4)
-                    minimumWidth = 156
+                    minimumWidth = 220
                     background = rounded(
                         if (i == activeTab) Color.rgb(35, 42, 55) else Color.rgb(24, 24, 24),
                         14f
@@ -410,7 +411,7 @@ class MainActivity : Activity() {
 
                 item.addView(TextView(this).apply {
                     text = label.take(18)
-                    textSize = 15f
+                    textSize = 17f
                     typeface = Typeface.DEFAULT_BOLD
                     setTextColor(Color.WHITE)
                     gravity = Gravity.CENTER_VERTICAL
@@ -421,30 +422,30 @@ class MainActivity : Activity() {
 
                 item.addView(TextView(this).apply {
                     text = "×"
-                    textSize = 26f
+                    textSize = 32f
                     gravity = Gravity.CENTER
                     setTextColor(Color.WHITE)
                     background = rounded(Color.rgb(55, 55, 55), 10f)
                     setOnClickListener { closeTab(i) }
-                }, LinearLayout.LayoutParams(40, 44).apply {
+                }, LinearLayout.LayoutParams(56, 56).apply {
                     leftMargin = 8
                 })
 
                 item.setOnClickListener { switchTab(i) }
                 tabStrip.addView(item, LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, 56
-                ).apply { rightMargin = 8 })
+                    ViewGroup.LayoutParams.WRAP_CONTENT, 72
+                ).apply { rightMargin = 10 })
             }
 
             tabStrip.addView(TextView(this).apply {
                 text = "+"
-                textSize = 32f
+                textSize = 36f
                 typeface = Typeface.DEFAULT_BOLD
                 gravity = Gravity.CENTER
                 setTextColor(accent)
                 background = rounded(Color.rgb(35, 42, 55), 14f)
                 setOnClickListener { addTab() }
-            }, LinearLayout.LayoutParams(56, 56).apply { leftMargin = 2 })
+            }, LinearLayout.LayoutParams(72, 72).apply { leftMargin = 4 })
         }
 
 
