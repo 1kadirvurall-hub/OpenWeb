@@ -293,11 +293,13 @@ class MainActivity : Activity() {
     private fun makeTabCountButton(top: Boolean): TextView {
         val count = tabs.count { it !in privateTabs }
         return TextView(this).apply {
-            text = "▢ $count"
-            textSize = if (top) 14f else 17f
+            text = "▣\\n$count"
+            textSize = if (top) 19f else 22f
             gravity = Gravity.CENTER
-            minWidth = if (top) 48 else 56
-            setPadding(6, 0, 6, 0)
+            minWidth = if (top) 52 else 62
+            minHeight = if (top) 52 else 58
+            setPadding(4, 2, 4, 2)
+            background = rounded(Color.rgb(35, 42, 55), 10f)
             setTextColor(accent)
             contentDescription = "Normal sekmeler: $count"
             setOnClickListener { showTabsMenu() }
@@ -308,11 +310,11 @@ class MainActivity : Activity() {
     private fun updateTabCounts() {
         val count = tabs.count { it !in privateTabs }
         topTabCountButton?.apply {
-            text = "▢ $count"
+            text = "▣\\n$count"
             contentDescription = "Normal sekmeler: $count"
         }
         bottomTabCountButton?.apply {
-            text = "▢ $count"
+            text = "▣\\n$count"
             contentDescription = "Normal sekmeler: $count"
         }
     }
