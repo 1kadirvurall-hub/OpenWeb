@@ -572,9 +572,11 @@ class MainActivity : Activity() {
             .quick img{width:32px;height:32px;object-fit:contain;border-radius:8px}
             .quick .remove{position:absolute;right:5px;top:3px;width:23px;height:23px;
             border:0;border-radius:50%;background:#252525;color:#fff;font-size:15px;padding:0}
-            .add{background:#07131b;border:1px dashed #36c9f0;border-radius:20px;
-            min-height:94px;color:#36c9f0;font-size:30px;display:flex;
-            align-items:center;justify-content:center}
+            .add{width:100%;min-height:94px;padding:16px 4px 12px;
+            background:#000;border:1px dashed #36c9f0;border-radius:20px;
+            color:#36c9f0;font-size:32px;font-weight:normal;
+            display:flex;flex-direction:column;align-items:center;justify-content:center;
+            box-sizing:border-box}
             .symbol{display:block;font-size:27px;margin-bottom:12px;color:#36c9f0}
             .foot{margin-top:34px;color:#627895;font-size:12px}
             </style>
