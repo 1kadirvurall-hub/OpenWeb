@@ -470,7 +470,7 @@ class MainActivity : Activity() {
             "Sayfayı yenile",
             "İndirilenler"
         )
-        android.app.AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        val dialog = android.app.AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
             .setTitle("OpenWeb")
             .setItems(options) { _, which ->
                 when (which) {
@@ -481,7 +481,20 @@ class MainActivity : Activity() {
                     4 -> startActivity(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS))
                 }
             }
-            .show()
+            .create()
+        dialog.setOnShowListener {
+            dialog.window?.setBackgroundDrawableResource(android.R.color.black)
+            val titleId = resources.getIdentifier("alertTitle", "id", "android")
+            dialog.findViewById<android.widget.TextView>(titleId)?.setTextColor(Color.WHITE)
+            val listId = resources.getIdentifier("select_dialog_listview", "id", "android")
+            dialog.findViewById<android.widget.ListView>(listId)?.apply {
+                setBackgroundColor(Color.BLACK)
+                for (i in 0 until childCount) {
+                    (getChildAt(i) as? android.widget.TextView)?.setTextColor(Color.WHITE)
+                }
+            }
+        }
+        dialog.show()
     }
 
     @Deprecated("Deprecated in Android")
