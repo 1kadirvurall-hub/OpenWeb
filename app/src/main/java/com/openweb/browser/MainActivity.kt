@@ -95,7 +95,9 @@ class MainActivity : Activity() {
         })
         header.addView(titleBox, LinearLayout.LayoutParams(0, -2, 1f))
 
-        header.addView(makeTabCountButton(true))
+        header.addView(makeIconButton("▢", "Sekmeler") {
+            showTabsMenu()
+        })
         header.addView(makeIconButton("⋮", "Menü") {
             showBrowserMenu()
         })
@@ -212,8 +214,9 @@ class MainActivity : Activity() {
             loadHome()
         }, LinearLayout.LayoutParams(0, 62, 1f))
 
-        bottom.addView(makeTabCountButton(false),
-            LinearLayout.LayoutParams(0, 62, 1f))
+        bottom.addView(makeNavButton("▢", "Sekmeler") {
+            showTabsMenu()
+        }, LinearLayout.LayoutParams(0, 62, 1f))
 
         bottom.addView(makeNavButton("⋮", "Menü") {
             showBrowserMenu()
@@ -279,60 +282,13 @@ class MainActivity : Activity() {
         return TextView(this).apply {
             text = symbol
             contentDescription = description
-            textSize = 32f
+            textSize = 40f
             gravity = Gravity.CENTER
             setTextColor(accent)
             setOnClickListener { action() }
         }
     }
 
-
-    private var topTabCountButton: TextView? = null
-    private var bottomTabCountButton: TextView? = null
-
-    private fun makeTabCountButton(top: Boolean): TextView {
-        val count = tabs.count { it !in privateTabs }
-        return TextView(this).apply {
-            text = "▢ $count"
-            textSize = if (top) 22f else 26f
-            gravity = Gravity.CENTER
-            setTextColor(accent)
-            minWidth = if (top) 52 else 62
-            minHeight = if (top) 52 else 62
-            setPadding(0, 0, 0, 0)
-            background = rounded(Color.rgb(35, 42, 55), 12f)
-            contentDescription = "Sekmeler: $count"
-            setOnClickListener { showTabsMenu() }
-            if (top) topTabCountButton = this else bottomTabCountButton = this
-            setCompoundDrawablePadding(0)
-            post {
-                val badge = TextView(this@MainActivity).apply {
-                    text = count.toString()
-                    textSize = 12f
-                    gravity = Gravity.CENTER
-                    setTextColor(Color.WHITE)
-                    background = rounded(accent, 20f)
-                    elevation = 5f
-                }
-                val parent = parent as? ViewGroup
-                if (parent != null && tag != "badge-added") {
-                    tag = "badge-added"
-                }
-            }
-        }
-    }
-
-    private fun updateTabCounts() {
-        val count = tabs.count { it !in privateTabs }
-        topTabCountButton?.apply {
-            text = "▢ $count"
-            contentDescription = "Normal sekmeler: $count"
-        }
-        bottomTabCountButton?.apply {
-            text = "▢ $count"
-            contentDescription = "Normal sekmeler: $count"
-        }
-    }
 
     private fun showTabsMenu() {
         var showingPrivate = web in privateTabs
@@ -659,7 +615,7 @@ class MainActivity : Activity() {
 
                 item.addView(TextView(this).apply {
                     text = "×"
-                    textSize = 32f
+                    textSize = 40f
                     gravity = Gravity.CENTER
                     setTextColor(Color.WHITE)
                     background = rounded(Color.rgb(55, 55, 55), 10f)
@@ -683,7 +639,6 @@ class MainActivity : Activity() {
                 background = rounded(Color.rgb(35, 42, 55), 14f)
                 setOnClickListener { addTab() }
             }, LinearLayout.LayoutParams(72, 72).apply { leftMargin = 4 })
-            updateTabCounts()
         }
 
 
