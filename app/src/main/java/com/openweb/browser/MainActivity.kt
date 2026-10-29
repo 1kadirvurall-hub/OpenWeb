@@ -60,7 +60,7 @@ class MainActivity : Activity() {
         addressBarAtBottom = prefs.getBoolean("address_bottom", false)
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(14, 8, 14, 110)
+            setPadding(14, 8, 14, 8)
             setBackgroundColor(bg)
         }
 
@@ -198,29 +198,30 @@ class MainActivity : Activity() {
         val bottom = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
-            background = rounded(Color.BLACK, 24f)
-            setPadding(4, 4, 4, 4)
+            background = rounded(Color.rgb(8, 21, 43), 22f)
+            setPadding(4, 3, 4, 3)
+            clipToPadding = false
         }
 
         bottom.addView(makeNavButton("‹", "Geri") {
             if (web.canGoBack()) web.goBack()
-        }, LinearLayout.LayoutParams(0, 62, 1f))
+        }, LinearLayout.LayoutParams(0, 56, 1f))
 
         bottom.addView(makeNavButton("›", "İleri") {
             if (web.canGoForward()) web.goForward()
-        }, LinearLayout.LayoutParams(0, 62, 1f))
+        }, LinearLayout.LayoutParams(0, 56, 1f))
 
         bottom.addView(makeNavButton("⌂", "Ana sayfa") {
             loadHome()
-        }, LinearLayout.LayoutParams(0, 62, 1f))
+        }, LinearLayout.LayoutParams(0, 56, 1f))
 
         bottom.addView(makeNavButton("▢", "Sekmeler") {
             showTabsMenu()
-        }, LinearLayout.LayoutParams(0, 62, 1f))
+        }, LinearLayout.LayoutParams(0, 56, 1f))
 
         bottom.addView(makeNavButton("⋮", "Menü") {
             showBrowserMenu()
-        }, LinearLayout.LayoutParams(0, 62, 1f))
+        }, LinearLayout.LayoutParams(0, 56, 1f))
 
         tabStrip = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -282,9 +283,11 @@ class MainActivity : Activity() {
         return TextView(this).apply {
             text = symbol
             contentDescription = description
-            textSize = 36f
+            textSize = 30f
+            includeFontPadding = false
             gravity = Gravity.CENTER
             setTextColor(Color.rgb(10, 132, 255))
+            setPadding(0, 0, 0, 0)
             setOnClickListener { action() }
         }
     }
@@ -409,8 +412,10 @@ class MainActivity : Activity() {
 
                 val close = TextView(this).apply {
                     text = "×"
-                    textSize = 27f
+                    textSize = 25f
+                    includeFontPadding = false
                     gravity = Gravity.CENTER
+                    translationY = -1f
                     setTextColor(Color.WHITE)
                     background = rounded(Color.rgb(35, 35, 40), 30f)
                     elevation = 8f
@@ -615,8 +620,10 @@ class MainActivity : Activity() {
 
                 item.addView(TextView(this).apply {
                     text = "×"
-                    textSize = 40f
+                    textSize = 34f
+                    includeFontPadding = false
                     gravity = Gravity.CENTER
+                    translationY = -2f
                     setTextColor(Color.WHITE)
                     background = rounded(Color.rgb(55, 55, 55), 10f)
                     setOnClickListener { closeTab(i) }
@@ -874,7 +881,7 @@ class MainActivity : Activity() {
             .quick .remove{position:absolute;right:5px;top:3px;width:23px;height:23px;
             border:0;border-radius:50%;background:#252525;color:#fff;font-size:15px;padding:0}
             .add{width:100%;min-height:94px;padding:16px 4px 12px;
-            background:#000;border:1px dashed #36c9f0;border-radius:20px;
+            background:#000;border:1px dashed #17406B;border-radius:20px;
             color:#36c9f0;font-size:32px;font-weight:normal;
             display:flex;flex-direction:column;align-items:center;justify-content:center;
             box-sizing:border-box}
