@@ -27,6 +27,12 @@ class MainActivity : Activity() {
     private val tabs = mutableListOf<WebView>()
     private val privateTabs = mutableSetOf<WebView>()
     private var activeTab = 0
+
+    private val undoHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private var recentlyClosedTab: WebView? = null
+    private var recentlyClosedIndex = -1
+    private var undoBanner: View? = null
+    private var undoRunnable: Runnable? = null
     private lateinit var address: EditText
     private lateinit var progress: ProgressBar
 
@@ -421,7 +427,9 @@ class MainActivity : Activity() {
                         android.view.MotionEvent.ACTION_UP -> {
                             val dx = event.x - downX
                             val dy = event.y - downY
-                            if (dy < -65 && kotlin.math.abs(dy) > kotlin.math.abs(dx)) {
+                            if ((kotlin.math.abs(dx) > 75 &&
+                                    kotlin.math.abs(dx) > kotlin.math.abs(dy)) ||
+                                (dy < -75 && kotlin.math.abs(dy) > kotlin.math.abs(dx))) {
                                 val current = tabs.indexOf(tab)
                                 if (current >= 0) closeTab(current)
                                 dialog.setTitle("Sekmeler (${tabs.size})")
@@ -625,16 +633,116 @@ class MainActivity : Activity() {
     }
 
     private fun closeTab(index: Int) {
+        if (index !in tabs.indices) return
         if (tabs.size <= 1) {
             loadHome()
             return
         }
+
+        discardRecentlyClosedTab()
+
         val closing = tabs.removeAt(index)
         (closing.parent as? ViewGroup)?.removeView(closing)
-        closing.destroy()
-        activeTab = (index - 1).coerceAtLeast(0)
-        refreshTabStrip()
+        recentlyClosedTab = closing
+        recentlyClosedIndex = index
+
+        activeTab = when {
+            index < activeTab -> activeTab - 1
+            index == activeTab -> (index - 1).coerceAtLeast(0)
+            else -> activeTab
+        }
+
         switchTab(activeTab)
+        refreshTabStrip()
+        showUndoBanner()
+    }
+
+    private fun showUndoBanner() {
+        val root = window.decorView
+            .findViewById<ViewGroup>(android.R.id.content)
+            .getChildAt(0) as? LinearLayout ?: return
+
+        undoBanner?.let { (it.parent as? ViewGroup)?.removeView(it) }
+
+        val banner = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(16, 6, 8, 6)
+            background = rounded(Color.rgb(35, 42, 55), 16f)
+        }
+
+        banner.addView(TextView(this).apply {
+            text = "Sekme kapatıldı"
+            textSize = 14f
+            setTextColor(Color.WHITE)
+        }, LinearLayout.LayoutParams(0, 48, 1f))
+
+        banner.addView(TextView(this).apply {
+            text = "GERİ AL"
+            textSize = 14f
+            typeface = Typeface.DEFAULT_BOLD
+            gravity = Gravity.CENTER
+            setTextColor(accent)
+            setPadding(14, 0, 14, 0)
+            contentDescription = "Kapatılan sekmeyi geri al"
+            setOnClickListener { undoRecentlyClosedTab() }
+        }, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, 48
+        ))
+
+        undoBanner = banner
+        root.addView(
+            banner,
+            (root.childCount - 1).coerceAtLeast(0),
+            LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                topMargin = 6
+                bottomMargin = 6
+            }
+        )
+
+        undoRunnable = Runnable {
+            discardRecentlyClosedTab()
+        }
+        undoHandler.postDelayed(undoRunnable!!, 5000)
+    }
+
+    private fun undoRecentlyClosedTab() {
+        undoRunnable?.let { undoHandler.removeCallbacks(it) }
+        undoRunnable = null
+
+        val tab = recentlyClosedTab ?: return
+        val index = recentlyClosedIndex.coerceIn(0, tabs.size)
+
+        recentlyClosedTab = null
+        recentlyClosedIndex = -1
+        undoBanner?.let { (it.parent as? ViewGroup)?.removeView(it) }
+        undoBanner = null
+
+        tabs.add(index, tab)
+        activeTab = index
+        switchTab(index)
+        refreshTabStrip()
+
+        Toast.makeText(this, "Sekme geri açıldı", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun discardRecentlyClosedTab() {
+        undoRunnable?.let { undoHandler.removeCallbacks(it) }
+        undoRunnable = null
+
+        recentlyClosedTab?.let { tab ->
+            privateTabs.remove(tab)
+            (tab.parent as? ViewGroup)?.removeView(tab)
+            tab.destroy()
+        }
+        recentlyClosedTab = null
+        recentlyClosedIndex = -1
+
+        undoBanner?.let { (it.parent as? ViewGroup)?.removeView(it) }
+        undoBanner = null
     }
 
     private fun loadHome() {
