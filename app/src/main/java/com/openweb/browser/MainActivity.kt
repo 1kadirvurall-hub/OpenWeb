@@ -229,41 +229,55 @@ class MainActivity : Activity() {
         address.setText("")
         val html = """
             <!doctype html>
-            <html>
+            <html lang="tr">
             <head>
             <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta name="color-scheme" content="dark">
             <style>
             *{box-sizing:border-box}
-            body{margin:0;background:#080d18;color:#f0f5ff;
-            font-family:Arial,sans-serif;min-height:100vh;
-            display:flex;align-items:center;justify-content:center}
-            .wrap{width:100%;max-width:560px;padding:24px;text-align:center}
-            .logo{font-size:54px;color:#bed2f5}
-            h1{font-size:30px;margin:8px 0}
-            p{color:#91a4c0;margin:8px 0 28px}
-            form{display:flex;background:#111d30;border-radius:32px;
-            padding:6px 8px 6px 18px;gap:8px}
-            input{flex:1;min-width:0;background:transparent;border:0;
-            outline:0;color:#f0f5ff;font-size:16px}
-            button{border:0;border-radius:50%;width:42px;height:42px;
-            background:#243956;color:#fff;font-size:20px}
-            .links{display:grid;grid-template-columns:repeat(3,1fr);
-            gap:12px;margin-top:28px}
-            a{background:#111d30;border-radius:18px;padding:18px 4px;
-            color:#d5e2f8;text-decoration:none;font-size:13px}
+            body{margin:0;background:radial-gradient(circle at 50% 25%,#142b49 0,#080d18 58%);
+            color:#f0f5ff;font-family:Arial,sans-serif;min-height:100vh}
+            .wrap{width:100%;max-width:620px;margin:auto;padding:52px 22px 30px;text-align:center}
+            .logo{width:76px;height:76px;margin:0 auto 18px;border-radius:26px;
+            display:grid;place-items:center;background:#111d30;border:1px solid #294566;
+            color:#36c9f0;font-size:43px;box-shadow:0 10px 35px #0005}
+            h1{font-size:32px;letter-spacing:.4px;margin:0}
+            .tagline{color:#91a4c0;margin:10px 0 32px;font-size:14px}
+            form{display:flex;align-items:center;background:#111d30;border:1px solid #29405d;
+            border-radius:22px;padding:7px 8px 7px 18px;gap:8px;box-shadow:0 8px 25px #0003}
+            input{flex:1;min-width:0;background:transparent;border:0;outline:0;
+            color:#f0f5ff;font-size:16px;padding:12px 0}
+            input::placeholder{color:#91a4c0}
+            button{border:0;border-radius:16px;width:46px;height:46px;
+            background:#36c9f0;color:#081426;font-size:23px;font-weight:bold}
+            .section{margin:30px 0 14px;text-align:left;font-size:14px;font-weight:bold;color:#d5e2f8}
+            .links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+            a{background:linear-gradient(145deg,#14243a,#101a2b);border:1px solid #203651;
+            border-radius:20px;padding:19px 5px;color:#d5e2f8;text-decoration:none;font-size:13px}
+            a:active{background:#203956}
+            .symbol{display:block;font-size:27px;margin-bottom:12px;color:#36c9f0}
+            .foot{margin-top:34px;color:#627895;font-size:12px}
             </style>
             </head>
-            <body><div class="wrap">
-            <div class="logo">◉</div><h1>OpenWeb</h1>
-            <p>Özgürce keşfet.</p>
+            <body><main class="wrap">
+            <div class="logo">◎</div>
+            <h1>OpenWeb</h1>
+            <p class="tagline">Dünyayı keşfet, özgürce gezin.</p>
             <form action="https://www.google.com/search" method="get">
-            <input name="q" placeholder="Google'da ara..." autocomplete="off">
-            <button type="submit">➜</button></form>
+            <input name="q" placeholder="Ara veya web adresi yaz..." autocomplete="off">
+            <button type="submit" aria-label="Ara">➜</button>
+            </form>
+            <div class="section">Hızlı erişim</div>
             <div class="links">
-            <a href="https://www.google.com">◎<br><br>Google</a>
-            <a href="https://www.youtube.com">▶<br><br>YouTube</a>
-            <a href="https://www.wikipedia.org">◈<br><br>Wikipedia</a>
-            </div></div></body></html>
+            <a href="https://www.google.com"><span class="symbol">⌕</span>Google</a>
+            <a href="https://www.youtube.com"><span class="symbol">▶</span>YouTube</a>
+            <a href="https://www.wikipedia.org"><span class="symbol">◈</span>Wikipedia</a>
+            <a href="https://www.reddit.com"><span class="symbol">◉</span>Reddit</a>
+            <a href="https://github.com"><span class="symbol">⌘</span>GitHub</a>
+            <a href="https://www.bing.com"><span class="symbol">◇</span>Bing</a>
+            </div>
+            <div class="foot">OpenWeb · Özgürce keşfet.</div>
+            </main></body></html>
         """.trimIndent()
         web.loadDataWithBaseURL("https://openweb.local/", html, "text/html", "UTF-8", null)
     }
