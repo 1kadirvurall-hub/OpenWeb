@@ -233,7 +233,7 @@ class MainActivity : Activity() {
 
 
         root.addView(tabScroll, LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, 58
+            ViewGroup.LayoutParams.MATCH_PARENT, 64
         ))
         root.removeView(bottom)
         root.addView(bottom, LinearLayout.LayoutParams(
@@ -400,7 +400,7 @@ class MainActivity : Activity() {
                 val item = LinearLayout(this).apply {
                     orientation = LinearLayout.HORIZONTAL
                     gravity = Gravity.CENTER_VERTICAL
-                    setPadding(12, 8, 8, 8)
+                    setPadding(14, 10, 10, 10)
                     background = rounded(
                         if (i == activeTab) Color.rgb(35, 42, 55) else Color.rgb(18, 18, 18),
                         12f
@@ -409,7 +409,7 @@ class MainActivity : Activity() {
 
                 item.addView(TextView(this).apply {
                     text = label.take(18)
-                    textSize = 13f
+                    textSize = 14f
                     setTextColor(Color.WHITE)
                     maxLines = 1
                     ellipsize = android.text.TextUtils.TruncateAt.END
@@ -418,9 +418,9 @@ class MainActivity : Activity() {
 
                 item.addView(TextView(this).apply {
                     text = "×"
-                    textSize = 20f
+                    textSize = 22f
                     setTextColor(Color.LTGRAY)
-                    setPadding(10, 0, 0, 0)
+                    setPadding(12, 0, 0, 0)
                     setOnClickListener { closeTab(i) }
                 })
 
@@ -432,10 +432,10 @@ class MainActivity : Activity() {
 
             tabStrip.addView(TextView(this).apply {
                 text = "+"
-                textSize = 25f
+                textSize = 28f
                 gravity = Gravity.CENTER
                 setTextColor(accent)
-                setPadding(12, 0, 12, 0)
+                setPadding(16, 0, 16, 0)
                 setOnClickListener { addTab() }
             }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT))
         }
